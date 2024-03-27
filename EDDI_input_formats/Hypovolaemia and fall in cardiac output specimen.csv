@@ -1,5 +1,5 @@
 rtime,p1.mean,p1.sys,p1.dia,ecg.hr,spo2.ir_amp,co2.et,co2.fi,co2.rr,aa.mac_sum,t1.temp,ppv,,,
-29/05/2009 8:37,28091,28127,28066,75,948,340,0,12,161,3637,157.143,,,   TODO understand this csv file
+29/05/2009 8:37,28091,28127,28066,75,948,340,0,12,161,3637,157.143,,,
 29/05/2009 8:37,28135,28225,27995,75,954,347,0,12,161,3637,156.386,,,Note that these values are 100x the actual value
 29/05/2009 8:37,28184,28229,28100,75,969,345,0,12,161,3637,130.973,,,This is how the data came out of the monitor and so the algorithm has been
 29/05/2009 8:38,28267,28309,28224,75,959,352,0,12,162,3637,54.867,,,built around these values.
