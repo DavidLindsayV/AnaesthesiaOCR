@@ -1,4 +1,5 @@
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageFilter
+
 import os
 
 def resize_height(image, ideal_height):
@@ -24,18 +25,26 @@ def get_parameter_imgs(modified_image):
     art_psi_image = modified_image.crop((423, 430, 460, 450)) 
     #anaes concentration 1
     ana_conc1_image = modified_image.crop((115, 400, 160, 425)) 
-    # anaes concentration 2  #TODO ask Michael what concentration 1 and 2 are, and if there will always be 2 concentrations
+    # anaes concentration 2  
     ana_conc2_image = modified_image.crop((120, 425, 160, 445)) 
 
-    imageDict = {'heartrate':heartrate_image, 'ecto2':ecto2_image, 'fico2':fico2_image, 'rr':rr_image, 'sys_psi':sys_psi_image, 'dias_psi':dias_psi_image, 'art_psi':art_psi_image, 'ana_conc1': ana_conc1_image, 'ana_conc2': ana_conc2_image}
+    imageDict = {'ecg.hr':heartrate_image, 'co2.et':ecto2_image, 'co2.fi':fico2_image, 'co2.rr':rr_image, 'p1.sys':sys_psi_image, 'p1.dia':dias_psi_image, 'p1.mean':art_psi_image, 'n2o.et': ana_conc1_image, 'n2o.fi': ana_conc2_image}
 
     ideal_height = 100
     for key in imageDict.keys():
         #Resize the images so all text is of a usable size
         imageDict[key] = resize_height(imageDict[key], ideal_height)
 
-        #Denoise the image
+        #Convert to greyscale
+        imageDict[key] = imageDict[key].convert("L")
 
+        # # Enhance contrast
+        # contrast_enhancer = ImageEnhance.Contrast(imageDict[key])
+        # imageDict[key] = contrast_enhancer.enhance(20)  # Increase contrast (adjust as needed)
+        
+        # # Enhance sharpness
+        sharpness_enhancer = ImageEnhance.Sharpness(imageDict[key])
+        imageDict[key] = sharpness_enhancer.enhance(20.0)  # Increase sharpness (adjust as needed)
 
         #Save the images
         imageDict[key].save(os.path.join("processed_images", key + "-img.png"))

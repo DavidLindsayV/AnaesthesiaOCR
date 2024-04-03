@@ -22,6 +22,7 @@ for key in imagesDict.keys():
     files.append( ('file', (key, open(filenames[key]), 'application/pdf')))
     # files.append( ('file', (key, open(os.path.join("processed_images", key + "-img.png"), 'rb'), 'application/pdf')) )
 
+extracted_data = {}
 
 if model == "Nanonets_pythonOCR":
     model = NANONETSOCR()
@@ -30,7 +31,8 @@ if model == "Nanonets_pythonOCR":
 
     for key, value in filenames.items():
         pred_json = model.convert_to_prediction(value)
-        print(key + " " + pred_json['results'][0]['page_data'][0]['words'][0]['text'].strip())        
+        print(key + " " + pred_json['results'][0]['page_data'][0]['words'][0]['text'].strip())
+        extracted_data[key] = pred_json['results'][0]['page_data'][0]['words'][0]['text'].strip()
 
 elif model == "Nanonets_Requests":
     reqFiles = []
@@ -45,14 +47,23 @@ elif model == "Nanonets_Requests":
     response = response.json()
 
     for result in response['results']:
-        print(result['filename'] + " " + result['page_data'][0]['words'][0]['text'].strip())
-
+        first_text = ''
+        if len(result['page_data'][0]['words']) != 0:
+            first_text = result['page_data'][0]['words'][0]['text'].strip()
+        print(result['filename'] + " first_text=" + first_text + " full_text=" + result['page_data'][0]['raw_text'].strip())
+        extracted_data[result['filename']] = first_text
     # print(response['results'][0]['page_data'][0]['raw_text'].strip()) #this expression extracts the raw text from an entire image, all texts together
     # print(response['results'][0]['page_data'][0]['words'][0]['text'].strip()) #this expression extracts the first bit of text found. However, unreliable if no text is found
 
 elif model == "PyTesseract":
 
-    print(filenames)
     for key, value in filenames.items():
         text = pytesseract.image_to_string(value,lang='eng')
-        print(key + " " + text)
+        print(key + " value=" + text)
+        extracted_data[key] = text
+
+print()
+expected_data = {'ecg.hr': '76', 'co2.et': '37', 'co2.fi': '0', 'co2.rr': '16', 'p1.sys': '139', 'p1.dia': '79', 'p1.mean': '(94)', 'n2o.et': '0.80', 'n2o.fi': '2.1'}
+for key in expected_data.keys():
+    if expected_data[key] != extracted_data[key]:
+        print("WRONG " + key + ": Expected: " + expected_data[key] + " Actual: " + extracted_data[key])
