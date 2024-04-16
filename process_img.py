@@ -19,12 +19,12 @@ def remove_noise(image):
     return cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 15)
 
 
-def thresholding(image, thresh):
+def thresholding(image, percent):
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(image)
     # image = cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)[1]
-    image = cv2.threshold(image, min_val + (max_val-min_val)*0.75, 255, cv2.THRESH_BINARY)[1]
-    return image
-    # return cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU) [1]
+    # image = cv2.threshold(image, min_val + (max_val-min_val)*percent, 255, cv2.THRESH_BINARY)[1]
+    # return image
+    return cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU) [1]
 
 def flipGreyscale(image):
     return cv2.bitwise_not(image)
@@ -79,7 +79,13 @@ def enhanceSharpness(img, factor):
     img = cv2_to_pil(img)
     sharpness_enhancer = ImageEnhance.Sharpness(img)
     img = sharpness_enhancer.enhance(factor)  
-    return pil_to_opencv(img)
+    img = pil_to_opencv(img)
+    return img
+
+def despeckle_image(img, kernel_size, iterations):
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+    img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel, iterations=iterations)
+    return img
 
 def colorThresholding(image):
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -100,7 +106,7 @@ def get_parameter_imgs(modified_image):
     #ecto2
     ecto2_image = modified_image.crop((465, 330, 510, 365))
     #fico2
-    fico2_image = modified_image.crop((470, 365, 500, 390)) 
+    fico2_image = modified_image.crop((450, 365, 500, 390)) 
     #rr
     rr_image = modified_image.crop((500, 360, 530, 390)) 
     #systolic pressure
@@ -126,28 +132,17 @@ def get_parameter_imgs(modified_image):
         img = resize_height(img, ideal_height)
         img = pil_to_opencv(img)
         img = set_image_dpi(img)
-        # img = enhanceContrast(img, 5)
-        # img = enhanceSharpness(img, )
         # img = remove_noise(img)
-        # img = remove_noise(img)
-        img = colorThresholding(img)
-        # img = get_grayscale(img)
-        # img = thresholding(img, 220)
-        # img = flipGreyscale(img)
-
-
-        #Increase dpi
-        # img = set_image_dpi(img)
-
-        #Convert to greyscale
-        # img = img.convert("L")
-
-        #Normalise
-        # img = normalise(img)
-
-        # # Enhance contrast
+        img = enhanceContrast(img, 3)
         
-        # # Enhance sharpness
+        # img = despeckle_image(img, 5, 1)
+        # img = enhanceSharpness(img, 2)
+        
+        # img = colorThresholding(img)
+        img = get_grayscale(img)
+        # img = thresholding(img, 0.6)
+        # img = flipGreyscale(img)
+        # img = normalise(img)
 
         #Save the images
         img = cv2_to_pil(img)
@@ -165,7 +160,7 @@ def process_img(imgName):
     modified_image = image.transpose(Image.FLIP_TOP_BOTTOM)
     modified_image = modified_image.transpose(Image.FLIP_LEFT_RIGHT)
     modified_image = pil_to_opencv(modified_image)
-    modified_image = normalise(modified_image)
+    # modified_image = normalise(modified_image)
     # modified_image = deskew(modified_image) TODO deskew the image keystone correction
     modified_image = cv2_to_pil(modified_image)
 
@@ -180,3 +175,9 @@ def process_img(imgName):
     imgs = get_parameter_imgs(modified_image)
     return imgs
     # return None
+
+
+#TO TRY:
+# - keystone correction
+# - image despecling
+# - better AI

@@ -5,6 +5,7 @@ from nanonets import NANONETSOCR
 import json
 
 import pytesseract
+import PIL
 import requests
 
 from process_img import process_img
@@ -41,6 +42,7 @@ elif model == "Nanonets_Requests":
     reqFiles = []
     for key in imagesDict.keys():
         reqFiles.append( ('file', (key, open(os.path.join("processed_images", key + "-img.png"), 'rb'), 'application/pdf')) )
+    # reqFiles.append(('file', (key, open("image.png", 'rb'), 'application/pdf')))
 
     headers = {}
       # api_key = os.getenv("NANONETS_API_KEY")
@@ -60,6 +62,7 @@ elif model == "Nanonets_Requests":
         extracted_data[result['filename']] = first_text
     # print(response['results'][0]['page_data'][0]['raw_text'].strip()) #this expression extracts the raw text from an entire image, all texts together
     # print(response['results'][0]['page_data'][0]['words'][0]['text'].strip()) #this expression extracts the first bit of text found. However, unreliable if no text is found
+
 
 elif model == "PyTesseract":
 
