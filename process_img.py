@@ -1,9 +1,95 @@
+import tempfile
 from PIL import Image, ImageEnhance, ImageFilter
 
 import os
 
+import cv2
+import numpy as np
+from PIL import Image
+from deskew import determine_skew
+from typing import Tuple, Union
+import math
+
+def normalise(img):
+    norm_img = np.zeros((img.shape[0], img.shape[1]))
+    img = cv2.normalize(img, norm_img, 0, 255, cv2.NORM_MINMAX)
+    return img
+
+def remove_noise(image):
+    return cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 15)
+
+
+def thresholding(image, thresh):
+    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(image)
+    # image = cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)[1]
+    image = cv2.threshold(image, min_val + (max_val-min_val)*0.75, 255, cv2.THRESH_BINARY)[1]
+    return image
+    # return cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU) [1]
+
+def flipGreyscale(image):
+    return cv2.bitwise_not(image)
+
+def set_image_dpi(image):
+    im = cv2_to_pil(image)
+    length_x, width_y = im.size
+    factor = min(1, float(1024.0 / length_x))
+    size = int(factor * length_x), int(factor * width_y)
+    im_resized = im.resize(size, Image.LANCZOS)
+    return pil_to_opencv(im_resized)
+
+
 def resize_height(image, ideal_height):
     return image.resize((int(image.width/image.height * ideal_height), ideal_height))
+
+def rotate(
+        image: np.ndarray, angle: float, background: Union[int, Tuple[int, int, int]]
+) -> np.ndarray:
+    old_width, old_height = image.shape[:2]
+    angle_radian = math.radians(angle)
+    width = abs(np.sin(angle_radian) * old_height) + abs(np.cos(angle_radian) * old_width)
+    height = abs(np.sin(angle_radian) * old_width) + abs(np.cos(angle_radian) * old_height)
+
+    image_center = tuple(np.array(image.shape[1::-1]) / 2)
+    rot_mat = cv2.getRotationMatrix2D(image_center, angle, 1.0)
+    rot_mat[1, 2] += (width - old_width) / 2
+    rot_mat[0, 2] += (height - old_height) / 2
+    return cv2.warpAffine(image, rot_mat, (int(round(height)), int(round(width))), borderValue=background)
+
+
+def pil_to_opencv(pil_image):
+    numpy_image = np.array(pil_image)
+    opencv_image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
+    return opencv_image
+
+def cv2_to_pil(cv2_image):
+    cv2_image_rgb = cv2.cvtColor(cv2_image, cv2.COLOR_BGR2RGB)
+    pil_image = Image.fromarray(cv2_image_rgb)
+    return pil_image
+
+def get_grayscale(image):
+    return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+def enhanceContrast(img, factor):
+    img = cv2_to_pil(img)
+    contrast_enhancer = ImageEnhance.Contrast(img)
+    img = contrast_enhancer.enhance(factor) 
+    return pil_to_opencv(img)
+        
+def enhanceSharpness(img, factor):
+    img = cv2_to_pil(img)
+    sharpness_enhancer = ImageEnhance.Sharpness(img)
+    img = sharpness_enhancer.enhance(factor)  
+    return pil_to_opencv(img)
+
+def colorThresholding(image):
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    lower_color = np.array([0, 50, 100])    # Lower threshold for the target color (you can adjust these values)
+    upper_color = np.array([255, 255, 255])  # Upper threshold for the target color (you can adjust these values)
+    mask = cv2.inRange(hsv_image, lower_color, upper_color)
+    imask = mask>0
+    masked = np.zeros_like(image, np.uint8)
+    masked[imask] = image[imask]
+    return masked
 
 def get_parameter_imgs(modified_image):
     #parameters = 
@@ -28,25 +114,44 @@ def get_parameter_imgs(modified_image):
     # anaes concentration 2  
     ana_conc2_image = modified_image.crop((120, 425, 160, 445)) 
 
-    imageDict = {'ecg.hr':heartrate_image, 'co2.et':ecto2_image, 'co2.fi':fico2_image, 'co2.rr':rr_image, 'p1.sys':sys_psi_image, 'p1.dia':dias_psi_image, 'p1.mean':art_psi_image, 'n2o.et': ana_conc1_image, 'n2o.fi': ana_conc2_image}
+    imageDict = {'ecg.hr':heartrate_image, 'co2.et':ecto2_image, 'co2.fi':fico2_image, 'co2.rr':rr_image, 'p1.sys':sys_psi_image, 'p1.dia':dias_psi_image, 'p1.mean':art_psi_image, 'aa.et': ana_conc1_image, 'aa.fi': ana_conc2_image}
 
     ideal_height = 100
+
+    for filename in os.listdir("processed_images"):
+        os.remove(os.path.join("processed_images", filename))
+    modified_image.save(os.path.join("processed_images", "Img.png"))
     for key in imageDict.keys():
-        #Resize the images so all text is of a usable size
-        imageDict[key] = resize_height(imageDict[key], ideal_height)
+        img = imageDict[key]
+        img = resize_height(img, ideal_height)
+        img = pil_to_opencv(img)
+        img = set_image_dpi(img)
+        # img = enhanceContrast(img, 5)
+        # img = enhanceSharpness(img, )
+        # img = remove_noise(img)
+        # img = remove_noise(img)
+        img = colorThresholding(img)
+        # img = get_grayscale(img)
+        # img = thresholding(img, 220)
+        # img = flipGreyscale(img)
+
+
+        #Increase dpi
+        # img = set_image_dpi(img)
 
         #Convert to greyscale
-        imageDict[key] = imageDict[key].convert("L")
+        # img = img.convert("L")
+
+        #Normalise
+        # img = normalise(img)
 
         # # Enhance contrast
-        # contrast_enhancer = ImageEnhance.Contrast(imageDict[key])
-        # imageDict[key] = contrast_enhancer.enhance(20)  # Increase contrast (adjust as needed)
         
         # # Enhance sharpness
-        sharpness_enhancer = ImageEnhance.Sharpness(imageDict[key])
-        imageDict[key] = sharpness_enhancer.enhance(20.0)  # Increase sharpness (adjust as needed)
 
         #Save the images
+        img = cv2_to_pil(img)
+        imageDict[key] = img
         imageDict[key].save(os.path.join("processed_images", key + "-img.png"))
 
     return imageDict
@@ -59,8 +164,10 @@ def process_img(imgName):
     #Get image in the right orientation
     modified_image = image.transpose(Image.FLIP_TOP_BOTTOM)
     modified_image = modified_image.transpose(Image.FLIP_LEFT_RIGHT)
-
-    modified_image.save(os.path.join("processed_images", imgName))
+    modified_image = pil_to_opencv(modified_image)
+    modified_image = normalise(modified_image)
+    # modified_image = deskew(modified_image) TODO deskew the image keystone correction
+    modified_image = cv2_to_pil(modified_image)
 
     #Denoise image
     # open_cv_image = numpy.array(modified_image)
@@ -70,4 +177,6 @@ def process_img(imgName):
     #Make image greyscale 
     # modified_image = modified_image.convert('L')
 
-    return get_parameter_imgs(modified_image)
+    imgs = get_parameter_imgs(modified_image)
+    return imgs
+    # return None
