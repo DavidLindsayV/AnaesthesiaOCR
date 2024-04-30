@@ -68,7 +68,10 @@ def extract_data(imagesDict):
         reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory
         for key in imagesDict.keys():
             result = reader.readtext(os.path.join("processed_images", key + "-img.png"), detail=0) #this removes bounding box and confidence info
-            extracted_data[key] = result[0]
+            if len(result) > 0:
+                extracted_data[key] = result[0]
+            else:
+                extracted_data[key] = ''
             print(result)
 
     return extracted_data

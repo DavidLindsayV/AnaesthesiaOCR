@@ -159,10 +159,10 @@ def process_img(imgName):
     #Get image in the right orientation
     modified_image = image.transpose(Image.FLIP_TOP_BOTTOM)
     modified_image = modified_image.transpose(Image.FLIP_LEFT_RIGHT)
-    modified_image = pil_to_opencv(modified_image)
+    # modified_image = pil_to_opencv(modified_image)
     # modified_image = normalise(modified_image)
     # modified_image = deskew(modified_image) TODO deskew the image keystone correction
-    modified_image = cv2_to_pil(modified_image)
+    # modified_image = cv2_to_pil(modified_image)
 
     #Denoise image
     # open_cv_image = numpy.array(modified_image)
