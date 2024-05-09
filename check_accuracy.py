@@ -37,30 +37,35 @@ for row in range(0, dataframe1.max_row):
             columns.append(col[row].value)
         continue
     row_data = [None for x in range(len(fields))]
-
     col_num = -1
     for col in dataframe1.iter_cols(1, dataframe1.max_column):
         col_num += 1
-        if col[row].value is None:
-            end_of_data_reached = True
-            break #you've reached the end of recorded data
+
         if columns[col_num] in fields:
             row_data[fields.index(columns[col_num])] = str(col[row].value)
     if end_of_data_reached:
         break
     expected_data.append(row_data)
-    
+
 print("Expected data loaded")
 
 num_correct = 0
 num_incorrect = 0
+field_correct = [0 for x in range(len(fields))]
 for i in range(len(extracted_data)):
     for j in range(len(fields)):
         exp = expected_data[i][j]
         extr = extracted_data[i][j]
         if exp == extr:
             num_correct += 1
+            field_correct[j] += 1
         else:
             num_incorrect += 1
+    acc_so_far = num_correct/(num_correct + num_incorrect)
+    # print("ACCURACY SO FAR: " + str(num_correct/(num_correct + num_incorrect)))
+    print("Processed " + str(i+1) + " out of 182")
 
 print("ACCURACY: " + str(num_correct/(num_correct + num_incorrect)))
+
+for i in range(len(fields)):
+    print("Accuracy for field " + str(fields[i]) + " = " + str(field_correct[i]/182.0)) 

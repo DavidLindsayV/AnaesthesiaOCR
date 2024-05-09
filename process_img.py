@@ -124,8 +124,9 @@ def get_parameter_imgs(modified_image):
 
     ideal_height = 100
 
-    for filename in os.listdir("processed_images"):
-        os.remove(os.path.join("processed_images", filename))
+    # for filename in os.listdir("processed_images"):
+    #     os.remove(os.path.join("processed_images", filename))
+    
     modified_image.save(os.path.join("processed_images", "Img.png"))
     for key in imageDict.keys():
         img = imageDict[key]
@@ -147,7 +148,7 @@ def get_parameter_imgs(modified_image):
         #Save the images
         img = cv2_to_pil(img)
         imageDict[key] = img
-        imageDict[key].save(os.path.join("processed_images", key + "-img.png"))
+        # imageDict[key].save(os.path.join("processed_images", key + "-img.png"))
 
     return imageDict
     

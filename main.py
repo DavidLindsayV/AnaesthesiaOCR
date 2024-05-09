@@ -37,4 +37,4 @@ def write_to_csv_all_images():
     write_to_csv(ocr_data)
     print("Completed! Time taken = " + str(datetime.now() - starttime))
 
-test_with_one_image()
+write_to_csv_all_images()

@@ -1,18 +1,22 @@
 ###Where querying the AI occurs###
 
+import io
 import os
 from nanonets import NANONETSOCR
+import numpy as np
 import pytesseract
 import requests
+
+reader = None
 
 def extract_data(imagesDict):
     model = "Nanonets_Requests"
 
     filenames = {}
-    files = []
+    # files = []
     for key in imagesDict.keys():
         filenames[key] = os.path.join("processed_images", key + "-img.png")
-        files.append( ('file', (key, open(filenames[key]), 'application/pdf')))
+        # files.append( ('file', (key, open(filenames[key]), 'application/pdf')))
         # files.append( ('file', (key, open(os.path.join("processed_images", key + "-img.png"), 'rb'), 'application/pdf')) )
 
     extracted_data = {}
@@ -33,7 +37,12 @@ def extract_data(imagesDict):
     elif model == "Nanonets_Requests":
         reqFiles = []
         for key in imagesDict.keys():
-            reqFiles.append( ('file', (key, open(os.path.join("processed_images", key + "-img.png"), 'rb'), 'application/pdf')) )
+            pil_image = imagesDict[key]
+            bytes_io = io.BytesIO()
+            pil_image.save(bytes_io, format='PNG') 
+            bytes_io.seek(0)  
+            buffered_reader = io.BufferedReader(bytes_io)
+            reqFiles.append( ('file', (key, buffered_reader, 'application/pdf')) )
         # reqFiles.append(('file', (key, open("image.png", 'rb'), 'application/pdf')))
 
         headers = {}
@@ -44,6 +53,7 @@ def extract_data(imagesDict):
         url = "https://app.nanonets.com/api/v2/OCR/FullText"
 
         response = requests.request("POST", url, headers=headers, files=reqFiles, auth=requests.auth.HTTPBasicAuth(api_key, ''))
+        print(response)
         response = response.json()
         # print(response)
         for result in response['results']:
@@ -65,13 +75,15 @@ def extract_data(imagesDict):
 
     elif model == "EasyOCR":
         import easyocr
-        reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory
+        global reader
+        if reader == None:
+            print("loading EasyOCR")
+            reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory
         for key in imagesDict.keys():
-            result = reader.readtext(os.path.join("processed_images", key + "-img.png"), detail=0) #this removes bounding box and confidence info
+            result = reader.readtext(np.array(imagesDict[key]), detail=0) #this removes bounding box and confidence info
             if len(result) > 0:
                 extracted_data[key] = result[0]
             else:
                 extracted_data[key] = ''
-            print(result)
 
     return extracted_data
