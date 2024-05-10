@@ -10,7 +10,7 @@ import requests
 reader = None
 
 def extract_data(imagesDict):
-    model = "Nanonets_Requests"
+    model = "EasyOCR"
 
     filenames = {}
     # files = []

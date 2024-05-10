@@ -66,7 +66,7 @@ for i in range(len(extracted_data)):
             num_incorrect += 1
     acc_so_far = num_correct/(num_correct + num_incorrect)
     # print("ACCURACY SO FAR: " + str(num_correct/(num_correct + num_incorrect)))
-    print("Processed " + str(i+1) + " out of 182")
+    print("Processed " + str(i+1) + " out of " + str(len(expected_data)))
 
 print("ACCURACY: " + "{:.1f}".format((num_correct/(num_correct + num_incorrect))*100) + "%") 
 

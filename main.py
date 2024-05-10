@@ -30,7 +30,7 @@ def write_to_csv_all_images():
     num_images = len(os.listdir("images"))
     count = 1
     num_images = len(os.listdir("images"))
-    for i in range(1, num_images):
+    for i in range(1, num_images + 1):
         print("Processing image " + str(count) + "/" + str(num_images))
         count += 1
         filename = os.path.join("images", str(i) + "tmp.jpg")
