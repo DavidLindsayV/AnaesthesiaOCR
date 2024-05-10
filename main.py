@@ -17,7 +17,7 @@ def checkAnswers(extracted_data):
             print("WRONG " + key + " Expected: " + expected_data[key] + " Actual: " + extracted_data[key])
 
 def test_with_one_image():
-    imagesDict = process_img("image.png")
+    imagesDict = process_img("images/1tmp.jpg")
     time = datetime.now()
     extracted_data = [extract_data(imagesDict)]
     print("Time taken to perform AI OCR = " + str(datetime.now() - time))
@@ -29,10 +29,13 @@ def write_to_csv_all_images():
     ocr_data = []
     num_images = len(os.listdir("images"))
     count = 1
-    for filename in os.listdir("images"):
+    num_images = len(os.listdir("images"))
+    for i in range(1, num_images):
         print("Processing image " + str(count) + "/" + str(num_images))
         count += 1
-        imagesDict = process_img(os.path.join("images", filename))
+        filename = os.path.join("images", str(i) + "tmp.jpg")
+        imagesDict = process_img(filename)
+        print(filename)
         ocr_data.append(extract_data(imagesDict))
     write_to_csv(ocr_data)
     print("Completed! Time taken = " + str(datetime.now() - starttime))

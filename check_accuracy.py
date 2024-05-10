@@ -49,10 +49,13 @@ for row in range(0, dataframe1.max_row):
 
 print("Expected data loaded")
 
+print("Number of images in OCR output: " + str(len(extracted_data)) + " \nNumber of images in testing data: " + str(len(expected_data)))
 num_correct = 0
 num_incorrect = 0
 field_correct = [0 for x in range(len(fields))]
 for i in range(len(extracted_data)):
+    print(expected_data[i])
+    print(extracted_data[i])
     for j in range(len(fields)):
         exp = expected_data[i][j]
         extr = extracted_data[i][j]
@@ -65,7 +68,7 @@ for i in range(len(extracted_data)):
     # print("ACCURACY SO FAR: " + str(num_correct/(num_correct + num_incorrect)))
     print("Processed " + str(i+1) + " out of 182")
 
-print("ACCURACY: " + str(num_correct/(num_correct + num_incorrect)))
+print("ACCURACY: " + "{:.1f}".format((num_correct/(num_correct + num_incorrect))*100) + "%") 
 
 for i in range(len(fields)):
-    print("Accuracy for field " + str(fields[i]) + " = " + str(field_correct[i]/182.0)) 
+    print("Accuracy for field " + str(fields[i]) + " = " + "{:.1f}".format((field_correct[i]/len(expected_data))*100) + "%") 

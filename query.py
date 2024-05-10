@@ -24,7 +24,6 @@ def extract_data(imagesDict):
     if model == "Nanonets_pythonOCR":
         model = NANONETSOCR()
         # api_key = os.getenv("NANONETS_API_KEY")
-        #TODO remove this reference to api key and delete this key
         api_key="7360ff90-e64a-11ee-a0dd-1eb7c1521e8e"
 
         model.set_token(api_key)
@@ -47,7 +46,6 @@ def extract_data(imagesDict):
 
         headers = {}
         # api_key = os.getenv("NANONETS_API_KEY")
-        #TODO remove this reference to api key and delete this key
         api_key="7360ff90-e64a-11ee-a0dd-1eb7c1521e8e"
 
         url = "https://app.nanonets.com/api/v2/OCR/FullText"
