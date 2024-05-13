@@ -30,13 +30,14 @@ def checkAnswersForImg(imgNum, ocrAnswers):
             for col in dataframe1.iter_cols(1, dataframe1.max_column):
                 columns.append(col[row].value)
             continue
-        if row == imgNum + 1:
+        if row == imgNum:
             col_num = -1
             for col in dataframe1.iter_cols(1, dataframe1.max_column):
                 col_num += 1
                 if columns[col_num] in ocrAnswers.keys():
                     expected_data[columns[col_num]] = str(col[row].value)
     
+    print("Image = " + str(imgNum) + "tmp.jpg")
     print(expected_data)
     print(ocrAnswers)
     for key in ocrAnswers.keys():
@@ -74,4 +75,4 @@ def write_to_csv_all_images():
     write_to_csv(ocr_data)
     print("Completed! Time taken = " + str(datetime.now() - starttime))
 
-test_with_random_image()
+write_to_csv_all_images()

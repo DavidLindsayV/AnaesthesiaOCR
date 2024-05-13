@@ -2,12 +2,34 @@
 
 import io
 import os
+import re
 from nanonets import NANONETSOCR
 import numpy as np
 import pytesseract
 import requests
 
 reader = None
+
+#gotten wrong: co2.rr as L
+#ecg.hr 
+
+def sanitycheck_data(extracted_data): 
+    print(extracted_data)
+    for key in extracted_data.keys():
+        if not any(char.isdigit() for char in extracted_data[key]): #If the string is horribly wrong, or is empty, or is ---
+            extracted_data[key] = "---"  #easyOCR often reads --- as empty string. This fixes that problem
+            continue
+
+        if key == 'ecg.hr' or key == 'co2.et' or key == 'co2.fi' or key == 'co2.rr' or key == 'p1.sys' or key == 'p1.dia':
+            extracted_data[key] = re.sub(r'\D', '', extracted_data[key]) #remove any non-number characters
+        if key == 'p1.mean':
+            extracted_data[key] = "(" + re.sub(r'\D', '', extracted_data[key]) + ")"
+        if key == 'aa.et' or key == 'aa.fi':
+            extracted_data[key] = re.sub(r'[^\d.]', '', extracted_data[key])
+            if not '.' in extracted_data[key] and len(extracted_data[key]) > 1:
+                extracted_data[key] = extracted_data[key][0] + "." + extracted_data[key][1:]
+        
+    return extracted_data
 
 def extract_data(imagesDict):
     model = "EasyOCR"
@@ -84,4 +106,5 @@ def extract_data(imagesDict):
             else:
                 extracted_data[key] = ''
 
+    extracted_data = sanitycheck_data(extracted_data) #remove stray characters, make sure they're in the right format, etc
     return extracted_data
