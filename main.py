@@ -1,4 +1,5 @@
 import os
+import random
 from process_img import process_img
 from query import extract_data
 from write_to_csv import write_to_csv
@@ -16,13 +17,46 @@ def checkAnswers(extracted_data):
         if expected_data[key] != extracted_data[key]:
             print("WRONG " + key + " Expected: " + expected_data[key] + " Actual: " + extracted_data[key])
 
+def checkAnswersForImg(imgNum, ocrAnswers):
+    import openpyxl
+    dataframe = openpyxl.load_workbook("monitor_data.xlsx")
+    dataframe1 = dataframe.active
+    firstrow = True
+    columns = []
+    expected_data = {}
+    for row in range(0, dataframe1.max_row):
+        if firstrow:
+            firstrow = False
+            for col in dataframe1.iter_cols(1, dataframe1.max_column):
+                columns.append(col[row].value)
+            continue
+        if row == imgNum + 1:
+            col_num = -1
+            for col in dataframe1.iter_cols(1, dataframe1.max_column):
+                col_num += 1
+                if columns[col_num] in ocrAnswers.keys():
+                    expected_data[columns[col_num]] = str(col[row].value)
+    
+    print(expected_data)
+    print(ocrAnswers)
+    for key in ocrAnswers.keys():
+        if expected_data[key] != ocrAnswers[key]:
+            print("WRONG " + key + " Expected: " + expected_data[key] + " Actual: " + ocrAnswers[key])
+
 def test_with_one_image():
-    imagesDict = process_img("images/1tmp.jpg")
+    imagesDict = process_img("image.png")
     time = datetime.now()
     extracted_data = [extract_data(imagesDict)]
     print("Time taken to perform AI OCR = " + str(datetime.now() - time))
     checkAnswers(extracted_data[0])
-    write_to_csv(extracted_data)
+
+def test_with_random_image():
+    imgNum = random.randint(1, 182)
+    imagesDict = process_img(os.path.join("images", str(imgNum) + "tmp.jpg"))
+    time = datetime.now()
+    extracted_data = [extract_data(imagesDict)]
+    print("Time taken to perform AI OCR = " + str(datetime.now() - time))
+    checkAnswersForImg(imgNum, extracted_data[0])
 
 def write_to_csv_all_images():
     starttime = datetime.now()
@@ -40,4 +74,4 @@ def write_to_csv_all_images():
     write_to_csv(ocr_data)
     print("Completed! Time taken = " + str(datetime.now() - starttime))
 
-write_to_csv_all_images()
+test_with_random_image()
