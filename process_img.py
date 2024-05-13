@@ -106,9 +106,9 @@ def get_parameter_imgs(modified_image):
     #fico2
     co2_fi = modified_image.crop((450, 365, 500, 390)) 
     #rr
-    co2_rr = modified_image.crop((500, 360, 530, 390)) 
+    co2_rr = modified_image.crop((485, 360, 530, 390)) 
     #systolic pressure
-    p1_sys = modified_image.crop((410, 400, 470, 430)) 
+    p1_sys = modified_image.crop((410, 400, 480, 430)) 
     #diastolic pressure
     p1_dia = modified_image.crop((480, 400, 530, 430)) 
     #arterial pressure

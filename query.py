@@ -10,9 +10,8 @@ import requests
 
 reader = None
 
-#gotten wrong: co2.rr as L
-#ecg.hr 
 
+#TODO: sometimes p1.sys and p1.dia have no value displayed. The current sanitycheck will convert this to --- instead of leaving blank
 def sanitycheck_data(extracted_data): 
     print(extracted_data)
     for key in extracted_data.keys():
