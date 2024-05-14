@@ -63,7 +63,7 @@ num_correct = 0
 tot_edit_dist = 0
 tot_cer = 0
 tot_numerical_dist = 0
-eval_params = [[0 for y in range(3)] for x in range(len(fields))]   #this is a 2d array. The first index is what the field is. The second array is of [count_of_correct_ocr, total_edit_distance, total_cer]
+eval_params = [[0 for y in range(4)] for x in range(len(fields))]   #this is a 2d array. The first index is what the field is. The second array is of [count_of_correct_ocr, total_edit_distance, total_cer, tot_numeric_dist]
 
 for i in range(len(extracted_data)):
     # print(expected_data[i])
@@ -75,23 +75,23 @@ for i in range(len(extracted_data)):
             num_correct += 1
             eval_params[j][0] += 1
         tot_edit_dist += edit_distance(exp, extr)
-        if(edit_distance(exp, extr) > 5):
-            print(exp + " " + extr)
         tot_cer += cer(exp, extr)
         eval_params[j][1] += edit_distance(exp, extr)
         eval_params[j][2] += cer(exp, extr)
-        # if re.search(r'[-+]?\d*\.?\d+', extr) and re.search(r'[-+]?\d*\.?\d+', exp):
-        #     exp = re.sub(r'[^0-9.]', '', exp)
-        #     extr = re.sub(r'[^0-9.]', '', extr)
-        #     tot_numerical_dist += abs(float(exp) - float(extr))
+        if re.search(r'[-+]?\d*\.?\d+', extr) and re.search(r'[-+]?\d*\.?\d+', exp):
+            exp = re.sub(r'[^0-9.]', '', exp)
+            extr = re.sub(r'[^0-9.]', '', extr)
+            tot_numerical_dist += abs(float(exp) - float(extr))
+            eval_params[j][3] += abs(float(exp) - float(extr))
 
     print("Processed " + str(i+1) + " out of " + str(len(expected_data)))
 
+print()
 tot_param_count = len(extracted_data) * len(fields)
 print("ACCURACY: " + "{:.1f}".format((num_correct/tot_param_count)*100) + "%") 
 print("AVG EDIT DISTANCE: " + "{:.3f}".format((tot_edit_dist/tot_param_count)))
 print("AVG CER: " + "{:.3f}".format((tot_cer/tot_param_count)))
-# print("AVG NUMERICAL DISTANCE: " + "{:.3f}".format((tot_numerical_dist/tot_param_count)))
-
+print("AVG NUMERICAL DISTANCE: " + "{:.3f}".format((tot_numerical_dist/tot_param_count)))
+print()
 for i in range(len(fields)):
-    print("Field " + str(fields[i]) + " Accuracy = " + "{:.1f}".format((eval_params[i][0]/len(expected_data))*100) + "% Avg Edit Distance: " + "{:.3f}".format((eval_params[i][1]/len(expected_data))) + " Avg CER: " + "{:.3f}".format((eval_params[i][2]/len(expected_data)))) 
+    print("Field " + str(fields[i]) + " Accuracy = " + "{:.1f}".format((eval_params[i][0]/len(expected_data))*100) + "% | Avg Edit Distance: " + "{:.3f}".format((eval_params[i][1]/len(expected_data))) + " | Avg CER: " + "{:.3f}".format((eval_params[i][2]/len(expected_data))) + " | Avg Numeric Distance = " + "{:.1f}".format((eval_params[i][3]/len(expected_data))) ) 
