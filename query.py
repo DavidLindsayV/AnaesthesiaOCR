@@ -12,6 +12,8 @@ reader = None
 
 
 #TODO: sometimes p1.sys and p1.dia have no value displayed. The current sanitycheck will convert this to --- instead of leaving blank
+#TODO: check the length of strings. p1.sys should have max 3 chars, p1.mean is 2 or 3 digits
+#TODO: check if digits are out of expected range
 def sanitycheck_data(extracted_data): 
     print(extracted_data)
     for key in extracted_data.keys():

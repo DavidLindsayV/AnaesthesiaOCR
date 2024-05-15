@@ -8,7 +8,6 @@ from jiwer import cer
 
 
 fields = ['ecg.hr', 'co2.et', 'co2.fi', 'co2.rr', 'p1.sys', 'p1.dia', 'p1.mean', 'aa.et', 'aa.fi']
-   
 
 extracted_data = []
 with open("easyocr_86.5.csv", 'r') as file:
@@ -63,7 +62,11 @@ num_correct = 0
 tot_edit_dist = 0
 tot_cer = 0
 tot_numerical_dist = 0
-eval_params = [[0 for y in range(4)] for x in range(len(fields))]   #this is a 2d array. The first index is what the field is. The second array is of [count_of_correct_ocr, total_edit_distance, total_cer, tot_numeric_dist]
+eval_params = [[0 for y in range(5)] for x in range(len(fields))]   #this is a 2d array. The first index is what the field is. The second array is of [count_of_correct_ocr, total_edit_distance, total_cer, tot_numeric_dist, tot_numeric_dist_normalised]
+
+#Estimates for the ranges of each physiological parameter. Note, these are ESTIMATES  TODO double check these estimates??
+field_ranges = {'ecg.hr': [140, 40], 'co2.et': [50, 0], 'co2.fi': [1, 0], 'co2.rr': [20, 4], 'p1.sys': [160, 50], 'p1.dia': [120, 40], 'p1.mean': [100, 50], 'aa.et': [3, 0], 'aa.fi': [5, 0]}
+
 
 for i in range(len(extracted_data)):
     # print(expected_data[i])
@@ -83,15 +86,21 @@ for i in range(len(extracted_data)):
             extr = re.sub(r'[^0-9.]', '', extr)
             tot_numerical_dist += abs(float(exp) - float(extr))
             eval_params[j][3] += abs(float(exp) - float(extr))
+            field_range = field_ranges[fields[j]][0] - field_ranges[fields[j]][1]
+            eval_params[j][4] += abs(float(exp) - float(extr))/field_range
 
     print("Processed " + str(i+1) + " out of " + str(len(expected_data)))
 
 print()
 tot_param_count = len(extracted_data) * len(fields)
 print("ACCURACY: " + "{:.1f}".format((num_correct/tot_param_count)*100) + "%") 
-print("AVG EDIT DISTANCE: " + "{:.3f}".format((tot_edit_dist/tot_param_count)))
-print("AVG CER: " + "{:.3f}".format((tot_cer/tot_param_count)))
+print("AVG EDIT DISTANCE: " + "{:.3f}".format((tot_edit_dist/tot_param_count)) + " edits")
+print("AVG CHARACTER ERROR RATE: " + "{:.3f}".format((tot_cer/tot_param_count)*100) + "%")
 print("AVG NUMERICAL DISTANCE: " + "{:.3f}".format((tot_numerical_dist/tot_param_count)))
 print()
 for i in range(len(fields)):
-    print("Field " + str(fields[i]) + " Accuracy = " + "{:.1f}".format((eval_params[i][0]/len(expected_data))*100) + "% | Avg Edit Distance: " + "{:.3f}".format((eval_params[i][1]/len(expected_data))) + " | Avg CER: " + "{:.3f}".format((eval_params[i][2]/len(expected_data))) + " | Avg Numeric Distance = " + "{:.1f}".format((eval_params[i][3]/len(expected_data))) ) 
+    print("Field " + str(fields[i]) + " Accuracy = " + "{:.1f}".format((eval_params[i][0]/len(expected_data))*100) + "% | Avg Edit Distance: " + "{:.3f}".format((eval_params[i][1]/len(expected_data))) + " edits | Avg CER: " + "{:.3f}".format((eval_params[i][2]/len(expected_data))*100) + "% | Avg Numeric Distance = " + "{:.1f}".format((eval_params[i][3]/len(expected_data))) + " | Normalised Avg Numeric Distance = " + "{:.1f}".format(((eval_params[i][4])/len(expected_data))*100  ) + "%") 
+
+
+
+#TODO calculate the odds of getting an entire row correct, not just one field in a row
