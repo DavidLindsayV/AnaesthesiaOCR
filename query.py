@@ -7,6 +7,7 @@ from nanonets import NANONETSOCR
 import numpy as np
 import pytesseract
 import requests
+import easyocr
 
 reader = None
 
@@ -31,6 +32,37 @@ def sanitycheck_data(extracted_data):
                 extracted_data[key] = extracted_data[key][0] + "." + extracted_data[key][1:]
         
     return extracted_data
+
+class BBox:
+
+    def __init__(self, box, text):
+        self.box = box #x0 y0 x1 y1
+        self.text = text
+    
+    def __repr__(self):
+        return f"BBox(array={self.box}, string='{self.text}')"
+
+def find_bboxes(image):
+    model = "EasyOCR"
+    bboxes = []
+
+    if model == "EasyOCR":
+        global reader
+        if reader == None:
+            print("loading EasyOCR")
+            reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory
+        result = reader.readtext(np.array(image))
+        for res in result:
+            x_values = [point[0] for point in res[0]]
+            y_values = [point[1] for point in res[0]]
+            xmin = min(x_values)
+            ymin = min(y_values)
+            xmax = max(x_values)
+            ymax = max(y_values)
+            bboxes.append(BBox((xmin, ymin, xmax, ymax), res[1]))
+    return bboxes
+
+
 
 def extract_data(imagesDict):
     model = "EasyOCR"
@@ -74,9 +106,7 @@ def extract_data(imagesDict):
         url = "https://app.nanonets.com/api/v2/OCR/FullText"
 
         response = requests.request("POST", url, headers=headers, files=reqFiles, auth=requests.auth.HTTPBasicAuth(api_key, ''))
-        print(response)
         response = response.json()
-        # print(response)
         for result in response['results']:
             first_text = ''
             if len(result['page_data'][0]['words']) != 0:
@@ -91,11 +121,10 @@ def extract_data(imagesDict):
 
         for key, value in filenames.items():
             text = pytesseract.image_to_string(value,lang='eng')
-            # print(key + " value=" + text)
+            print(key + " value=" + text)
             extracted_data[key] = text
 
     elif model == "EasyOCR":
-        import easyocr
         global reader
         if reader == None:
             print("loading EasyOCR")
