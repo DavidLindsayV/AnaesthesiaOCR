@@ -2,6 +2,8 @@ from PIL import Image, ImageEnhance, ImageFilter, ImageDraw, ImageFont
 import easyocr
 import numpy as np
 
+from monitor_values import OldMonitor
+
 def draw_boxes(image, box, text):
     draw = ImageDraw.Draw(image)
     font = ImageFont.load_default()
@@ -9,40 +11,42 @@ def draw_boxes(image, box, text):
     draw.rectangle(box, outline="red")
     return image
 
+def show_bboxes():
+    for q in range(1, 182):
+        img = Image.open("images/" + str(q) + "tmp.jpg")
+        img = img.transpose(Image.FLIP_TOP_BOTTOM)
+        img = img.transpose(Image.FLIP_LEFT_RIGHT)
+        result = reader.readtext(np.array(img)) #this removes bounding box and confidence info
+        new_img = img
+        for res in result:
+            x_values = [point[0] for point in res[0]]
+            y_values = [point[1] for point in res[0]]
+            xmin = min(x_values)
+            ymin = min(y_values)
+            xmax = max(x_values)
+            ymax = max(y_values)
+            new_img = draw_boxes(new_img, (xmin, ymin, xmax, ymax), res[1])
+        new_img.save("bboxImgs/new_image" + str(q) + ".png")
+
+def show_center_coords(center_coords, field_coords):
+    img = Image.open("image.png")
+    img = img.transpose(Image.FLIP_TOP_BOTTOM)
+    img = img.transpose(Image.FLIP_LEFT_RIGHT)
+    extracted_data = []
+    for key in center_coords.keys():
+        field_x = center_coords[key][0]
+        field_y = center_coords[key][1]
+        img = draw_boxes(img, (field_x, field_y, field_x+2, field_y+2), key)
+        img = draw_boxes(img, field_coords[key], '')
+    img.save("field_centers.png")
+
+    
+
 global reader
 print("loading EasyOCR")
 reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory
 
-for q in range(1, 182):
-    img = Image.open("images/" + str(q) + "tmp.jpg")
-    img = img.transpose(Image.FLIP_TOP_BOTTOM)
-    img = img.transpose(Image.FLIP_LEFT_RIGHT)
-    result = reader.readtext(np.array(img)) #this removes bounding box and confidence info
-    new_img = img
-    for res in result:
-        x_values = [point[0] for point in res[0]]
-        y_values = [point[1] for point in res[0]]
-        xmin = min(x_values)
-        ymin = min(y_values)
-        xmax = max(x_values)
-        ymax = max(y_values)
-        new_img = draw_boxes(new_img, (xmin, ymin, xmax, ymax), res[1])
-    new_img.save("bboxImgs/new_image" + str(q) + ".jpg")
-
-    # center_coords = {'ecg.hr': [540, 195], 'co2.et': [487, 347.5], 'co2.f1': [475, 377], 'co2.rr': [507, 375], 'p1.sys': [445, 415], 'p1.dia': [505, 415], 'p1.mean': [441, 440], 'aa.et': [137, 412], 'aa.fi': [140, 432]}
-
-    # extracted_data = []
-    # for key in center_coords.keys():
-    #     field_x = center_coords[key][0]
-    #     field_y = center_coords[key][1]
-    #     for res in result:
-    #         x_values = [point[0] for point in res[0]]
-    #         y_values = [point[1] for point in res[0]]
-    #         xmin = min(x_values)
-    #         ymin = min(y_values)
-    #         xmax = max(x_values)
-    #         ymax = max(y_values)
-    #         if xmin <= field_x <= xmax and ymin <= field_y <= ymax:
-    #             extracted_data[key] = res[1]
-
-    # print(result)
+# center_coords = OldMonitor.pos_centres
+# field_coords = OldMonitor.field_pos
+# show_center_coords(center_coords, field_coords)
+show_bboxes()

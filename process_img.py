@@ -10,6 +10,7 @@ from deskew import determine_skew
 from typing import Tuple, Union
 import math
 
+from monitor_values import OldMonitor
 from query import find_bboxes
 
 
@@ -126,17 +127,7 @@ def get_parameter_imgs(image):
 
     fieldCroppingMode = "BBox_Detection_Old_Monitor"
 
-    oldMonitor_Fieldpos = {
-        "ecg.hr": (500, 160, 580, 230),
-        "co2.et": (465, 330, 510, 365),
-        "co2.fi": (450, 365, 500, 390),
-        "co2.rr": (485, 360, 530, 390),
-        "p1.sys": (410, 400, 480, 430),
-        "p1.dia": (480, 400, 530, 430),
-        "p1.mean": (423, 430, 460, 450),
-        "aa.et": (115, 400, 160, 425),
-        "aa.fi": (120, 420, 160, 445),
-    }  # TODO ask Michael how many digits each of these can be, and whether the number of digits changes their positions
+    oldMonitor_Fieldpos = OldMonitor.field_pos
     imageDict = {}
 
     if fieldCroppingMode == "Manual_Old_Monitor":
@@ -195,7 +186,7 @@ def get_parameter_imgs(image):
         # img = colorThresholding(img)
         img = get_grayscale(img)
         # img = thresholding(img, 0.6)
-        # img = flipGreyscale(img)
+        img = flipGreyscale(img)
         # img = normalise(img)
 
         # Save the images
