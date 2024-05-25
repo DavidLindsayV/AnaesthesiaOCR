@@ -21,16 +21,19 @@ def normalise(img):
 
 
 def remove_noise(image):
-    return cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 15)
-    # return cv2.fastNlMeansDenoisingColored(image)
+    # return cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 15)
+    return cv2.fastNlMeansDenoisingColored(image)
 
 
-def thresholding(image, percent):
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(image)
+def thresholding(image):
+    # min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(image)
     # image = cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)[1]
     # image = cv2.threshold(image, min_val + (max_val-min_val)*percent, 255, cv2.THRESH_BINARY)[1]
     # return image
-    return cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+    # return cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+
+    image = cv2.medianBlur(image,5)
+    return cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
 
 
 def flipGreyscale(image):
@@ -122,9 +125,13 @@ def colorThresholding(image):
     masked[imask] = image[imask]
     return masked
 
+def equalizeHist(img):
+    return cv2.equalizeHist(img)
 
-def get_parameter_imgs(image):
+def gaussianBlur(img):
+    return cv2.GaussianBlur(img, (5, 5), 1)
 
+def get_field_cropped_imgs(image):
     fieldCroppingMode = "BBox_Detection_Old_Monitor"
 
     oldMonitor_Fieldpos = OldMonitor.field_pos
@@ -165,6 +172,9 @@ def get_parameter_imgs(image):
             
         for field, bbox in bestBBox.items():
             imageDict[field] = image.crop(bbox)
+    return imageDict
+
+def get_parameter_imgs(image):
 
     ideal_height = 100
 
@@ -172,20 +182,35 @@ def get_parameter_imgs(image):
         os.remove(os.path.join("processed_images", filename))
 
     image.save(os.path.join("processed_images", "Img.png"))
+
+    origSize = image.size
+    imageDict = get_field_cropped_imgs(image)
+
     for key in imageDict.keys():
+
         img = imageDict[key]
         img = resize_height(img, ideal_height)
+
+        # black_image = Image.new('RGB', origSize, (0, 0, 0))
+        # black_image.paste(img, [int(origSize[0]/2), int(origSize[1]/2)])
+        # img = black_image
+
         img = pil_to_opencv(img)
         img = set_image_dpi(img)
-        # img = remove_noise(img)
-        img = enhanceContrast(img, 3)
+        img = remove_noise(img)
+
+
+        # factor = 3 + 
+        img = enhanceContrast(img, 8)
 
         # img = despeckle_image(img, 5, 1)
         # img = enhanceSharpness(img, 2)
-
         # img = colorThresholding(img)
         img = get_grayscale(img)
-        # img = thresholding(img, 0.6)
+
+        # img = guassianBlur(img)
+        # img = equalizeHist(img)
+        # img = thresholding(img)
         img = flipGreyscale(img)
         # img = normalise(img)
 

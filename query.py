@@ -61,7 +61,10 @@ def make_in_range(field, num):
 def sanitycheck_data(extracted_data):
     print("Data pre-sanity check:")
     print(extracted_data)
+
     for key in extracted_data.keys():
+        extracted_data[key] = extracted_data[key].replace('O', '0')
+        extracted_data[key] = extracted_data[key].replace('B', '8')
         if not any(
             char.isdigit() for char in extracted_data[key]
         ):  # If the string is horribly wrong, or is empty, or is ---
