@@ -34,10 +34,10 @@ def thresholding(image):
     # image = cv2.threshold(image, thresh, 255, cv2.THRESH_BINARY)[1]
     # image = cv2.threshold(image, min_val + (max_val-min_val)*percent, 255, cv2.THRESH_BINARY)[1]
     # return image
-    # return cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+    return cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
-    image = cv2.medianBlur(image,5)
-    return cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,21,6)
+    # image = cv2.medianBlur(image,5)
+    # return cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,21,6)
 
 def flipGreyscale(image):
     return cv2.bitwise_not(image)
@@ -280,7 +280,7 @@ def get_parameter_imgs(image):
         img = enhanceContrast(img, 4)
 
         # img = despeckle_image(img, 5, 1)
-        # img = enhanceSharpness(img, 2)
+        img = enhanceSharpness(img, 2)
         # img = colorThresholding(img)
         img = get_grayscale(img)
 

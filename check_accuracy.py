@@ -102,6 +102,8 @@ for i in range(len(extracted_data)):
         if exp == extr:
             num_correct += 1
             eval_params[j][0] += 1
+        else:
+            print("Field: " + fields[j] + " Exp: " + exp + " Extr: " + extr)
         tot_edit_dist += edit_distance(exp, extr)
         tot_cer += cer(exp, extr)
         eval_params[j][1] += edit_distance(exp, extr)

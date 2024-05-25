@@ -42,6 +42,8 @@ def make_in_range(field, num):
         if float(num) > OldMonitor.field_ranges[field][0]: #If you are above the max
             preNum = num[:-1]
             postNum = num[1:]
+            print(preNum)
+            print(postNum)
             #If removing the first or last character makes the number in the correct range, and  you can clearly tell which to remove
             if inRange(field, preNum) and not inRange(field, postNum):
                 return preNum
@@ -52,7 +54,8 @@ def make_in_range(field, num):
                 return preNum
             if num.startswith('1') and inRange(field, postNum):
                 return postNum
-            
+            if inRange(field, preNum) and inRange(field, postNum): #if both are valid, choose the one which removes the first character TODO this is arbitrary
+                return postNum
         #Give up, you can't make this number fit the range
         print("Failed to make into correct range: " + field + " " + num)
         return num 
@@ -235,3 +238,4 @@ def extract_data(imagesDict):
 
 # img = Image.open("processed_images\co2.rr-img.png")
 # print(extract_data({'co2.rr': img }))
+# print(make_in_range('p1.mean', removeNonNumberChar("676")))
