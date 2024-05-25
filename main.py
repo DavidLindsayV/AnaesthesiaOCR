@@ -51,13 +51,16 @@ def test_with_one_image():
     print("Time taken to perform AI OCR = " + str(datetime.now() - time))
     checkAnswers(extracted_data[0])
 
-def test_with_random_image():
-    imgNum = random.randint(1, 182)
+def test_with_img(imgNum):
     imagesDict = process_img(os.path.join("images", str(imgNum) + "tmp.jpg"))
     time = datetime.now()
     extracted_data = [extract_data(imagesDict)]
     print("Time taken to perform AI OCR = " + str(datetime.now() - time))
     checkAnswersForImg(imgNum, extracted_data[0])
+
+def test_with_random_image():
+    imgNum = random.randint(1, 182)
+    test_with_img(imgNum)
 
 def write_to_csv_all_images():
     starttime = datetime.now()
@@ -76,4 +79,8 @@ def write_to_csv_all_images():
     print("Completed! Time taken = " + str(datetime.now() - starttime))
 
 write_to_csv_all_images()
-# test_with_random_image()
+# import sys
+# if len(sys.argv) > 1:
+#     test_with_img(int(sys.argv[1]))
+# else:
+#     test_with_random_image()

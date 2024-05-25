@@ -11,8 +11,9 @@ def draw_boxes(image, box, text):
     draw.rectangle(box, outline="red")
     return image
 
-def show_bboxes():
+def show_bboxes(center_coords):
     for q in range(1, 182):
+        print(q)
         img = Image.open("images/" + str(q) + "tmp.jpg")
         img = img.transpose(Image.FLIP_TOP_BOTTOM)
         img = img.transpose(Image.FLIP_LEFT_RIGHT)
@@ -26,6 +27,13 @@ def show_bboxes():
             xmax = max(x_values)
             ymax = max(y_values)
             new_img = draw_boxes(new_img, (xmin, ymin, xmax, ymax), res[1])
+        
+        #show the centre coords as well
+        for key in center_coords.keys():
+            field_x = center_coords[key][0]
+            field_y = center_coords[key][1]
+            new_img = draw_boxes(new_img, (field_x, field_y, field_x+2, field_y+2), '') 
+
         new_img.save("bboxImgs/new_image" + str(q) + ".png")
 
 def show_center_coords(center_coords, field_coords):
@@ -46,7 +54,7 @@ global reader
 print("loading EasyOCR")
 reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory
 
-# center_coords = OldMonitor.pos_centres
-# field_coords = OldMonitor.field_pos
+center_coords = OldMonitor.pos_centres
+field_coords = OldMonitor.field_pos
 # show_center_coords(center_coords, field_coords)
-show_bboxes()
+show_bboxes(center_coords)

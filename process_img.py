@@ -9,6 +9,7 @@ from PIL import Image
 from deskew import determine_skew
 from typing import Tuple, Union
 import math
+from skimage import io, restoration, img_as_ubyte
 
 from monitor_values import OldMonitor
 from query import find_bboxes
@@ -24,6 +25,9 @@ def remove_noise(image):
     # return cv2.fastNlMeansDenoisingColored(image, None, 10, 10, 7, 15)
     return cv2.fastNlMeansDenoisingColored(image)
 
+def bilateral_filter_noseremover(img):
+    return cv2.bilateralFilter(img, 9, 75, 75)
+
 
 def thresholding(image):
     # min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(image)
@@ -33,8 +37,7 @@ def thresholding(image):
     # return cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
     image = cv2.medianBlur(image,5)
-    return cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
-
+    return cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,21,6)
 
 def flipGreyscale(image):
     return cv2.bitwise_not(image)
@@ -131,6 +134,51 @@ def equalizeHist(img):
 def gaussianBlur(img):
     return cv2.GaussianBlur(img, (5, 5), 1)
 
+def size_threshold(bw, minimum, maximum):
+    retval, labels, stats, centroids = cv2.connectedComponentsWithStats(bw)
+    for val in np.where((stats[:, 4] < minimum) + (stats[:, 4] > maximum))[0]:
+      labels[labels==val] = 0
+    return (labels > 0).astype(np.uint8) * 255  
+
+def scikit_denoising(img):
+    denoised_image = restoration.denoise_tv_chambolle(img, weight=0.1)
+    return img_as_ubyte(denoised_image)
+
+def dist_to_bbox(point, bbox):
+    px, py = point
+    x0, y0, x1, y1 = bbox
+    # Ensure the box coordinates are correctly ordered
+    x_min, x_max = sorted([x0, x1])
+    y_min, y_max = sorted([y0, y1])
+        # Calculate the shortest distance to the box
+    if px < x_min:
+        if py < y_min:
+            # Point is to the top-left of the box
+            return math.sqrt((x_min - px) ** 2 + (y_min - py) ** 2)
+        elif py > y_max:
+            # Point is to the bottom-left of the box
+            return math.sqrt((x_min - px) ** 2 + (y_max - py) ** 2)
+        else:
+            # Point is directly to the left of the box
+            return x_min - px
+    elif px > x_max:
+        if py < y_min:
+            # Point is to the top-right of the box
+            return math.sqrt((x_max - px) ** 2 + (y_min - py) ** 2)
+        elif py > y_max:
+            # Point is to the bottom-right of the box
+            return math.sqrt((x_max - px) ** 2 + (y_max - py) ** 2)
+        else:
+            # Point is directly to the right of the box
+            return px - x_max
+    else:
+        if py < y_min:
+            # Point is directly above the box
+            return y_min - py
+        else:
+            # Point is directly below the box
+            return py - y_max
+
 def get_field_cropped_imgs(image):
     fieldCroppingMode = "BBox_Detection_Old_Monitor"
 
@@ -148,14 +196,30 @@ def get_field_cropped_imgs(image):
 
         bboxes = find_bboxes(image)
 
+        #how many pixels the position of each field on the screen has shifted. Judged based on how off-centre the ecg.hr box is
+        xShift = 0
+        yShift = 0
+        for bbox in bboxes:
+            xmin = bbox.box[0]
+            ymin = bbox.box[1]
+            xmax = bbox.box[2]
+            ymax = bbox.box[3]
+            if xmin <= center_coords['ecg.hr'][0] <= xmax and ymin <= center_coords['ecg.hr'][1] <= ymax:
+                xCentre = int((xmin + xmax)/2)
+                yCentre = int((ymin + ymax)/2)
+                xShift = xCentre - center_coords['ecg.hr'][0]
+                yShift = yCentre - center_coords['ecg.hr'][1]
+        for key, center in center_coords.items():
+            center_coords[key] = (center[0] + xShift, center[1] + yShift)
+
         bestBBox = {}
         for field, coords in center_coords.items():
             for bbox in bboxes:
-                xmin = bbox.box[0]
-                ymin = bbox.box[1]
-                xmax = bbox.box[2]
-                ymax = bbox.box[3]
-                if xmin <= coords[0] <= xmax and ymin <= coords[1] <= ymax:
+                xmin = bbox.box[0] 
+                ymin = bbox.box[1] 
+                xmax = bbox.box[2] 
+                ymax = bbox.box[3] 
+                if xmin <= coords[0] <= xmax and ymin <= coords[1] <= ymax and dist_to_bbox(coords, bbox.box) < 0.5*(oldMonitor_Fieldpos[field][3] - oldMonitor_Fieldpos[field][1]):
                     if not field in bestBBox.keys():
                         bestBBox[field] = bbox.box
                     else:
@@ -170,6 +234,15 @@ def get_field_cropped_imgs(image):
                 print("No bbox found for " + field)
                 bestBBox[field] = oldMonitor_Fieldpos[field]
             
+        #manual fix for co2.rr being misread because it includes co2.fi
+        if bestBBox['co2.rr'][0] < center_coords['co2.fi'][0] < bestBBox['co2.rr'][2] and bestBBox['co2.rr'][1] < center_coords['co2.fi'][1] < bestBBox['co2.rr'][3]:
+                xmin = bestBBox['co2.rr'][0]
+                ymin = bestBBox['co2.rr'][1]
+                xmax = bestBBox['co2.rr'][2]
+                ymax = bestBBox['co2.rr'][3]
+                bestBBox['co2.rr'] = (int(xmin + (xmax - xmin)/2) , ymin, xmax, ymax)
+                bestBBox['co2.fi'] = (xmin, ymin, int((xmin + (xmax - xmin)/2)), ymax)
+
         for field, bbox in bestBBox.items():
             imageDict[field] = image.crop(bbox)
     return imageDict
@@ -197,11 +270,14 @@ def get_parameter_imgs(image):
 
         img = pil_to_opencv(img)
         img = set_image_dpi(img)
-        img = remove_noise(img)
-
+        # img = scikit_denoising(img)
+        # img = bilateral_filter_noseremover(img)
+        # img = remove_noise(img)
+        # img = gaussianBlur(img)
+        # img = remove_noise(img)
 
         # factor = 3 + 
-        img = enhanceContrast(img, 8)
+        img = enhanceContrast(img, 4)
 
         # img = despeckle_image(img, 5, 1)
         # img = enhanceSharpness(img, 2)
@@ -211,6 +287,7 @@ def get_parameter_imgs(image):
         # img = guassianBlur(img)
         # img = equalizeHist(img)
         # img = thresholding(img)
+        # img = size_threshold(img, 4000, 99999999999)
         img = flipGreyscale(img)
         # img = normalise(img)
 
