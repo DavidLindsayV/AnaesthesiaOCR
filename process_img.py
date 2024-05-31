@@ -43,15 +43,6 @@ def flipGreyscale(image):
     return cv2.bitwise_not(image)
 
 
-def set_image_dpi(image):
-    im = cv2_to_pil(image)
-    length_x, width_y = im.size
-    factor = min(1, float(1024.0 / length_x))
-    size = int(factor * length_x), int(factor * width_y)
-    im_resized = im.resize(size, Image.LANCZOS)
-    return pil_to_opencv(im_resized)
-
-
 def resize_height(image, ideal_height):
     return image.resize((int(image.width / image.height * ideal_height), ideal_height))
 
@@ -239,7 +230,7 @@ def get_field_cropped_imgs(image):
                 xmin = bestBBox['co2.rr'][0]
                 ymin = bestBBox['co2.rr'][1]
                 xmax = bestBBox['co2.rr'][2]
-                ymax = bestBBox['co2.rr'][3]
+                ymax = bestBBox['co2.rr'][3] 
                 bestBBox['co2.rr'] = (int(xmin + (xmax - xmin)/2) , ymin, xmax, ymax)
                 bestBBox['co2.fi'] = (xmin, ymin, int((xmin + (xmax - xmin)/2)), ymax)
 
@@ -269,7 +260,7 @@ def get_parameter_imgs(image):
         # img = black_image
 
         img = pil_to_opencv(img)
-        img = set_image_dpi(img)
+        
         # img = scikit_denoising(img)
         # img = bilateral_filter_noseremover(img)
         # img = remove_noise(img)

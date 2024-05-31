@@ -1,9 +1,11 @@
 import re
 import sys
+import numpy as np
 import pandas as pd
 from nltk.metrics.distance import edit_distance
 import csv
 from jiwer import cer
+import matplotlib.pyplot as plt
 
 from monitor_values import OldMonitor
 
@@ -26,7 +28,7 @@ fields = [
 # aa.fi 93
 
 extracted_data = []
-with open("output.csv", "r") as file:
+with open("easyocr_96.3.csv", "r") as file:
     csvreader = csv.reader(file)
     firstrow = True
     columns = []
@@ -129,39 +131,85 @@ for i in range(len(extracted_data)):
 
     print("Processed " + str(i + 1) + " out of " + str(len(expected_data)))
 
+
 print()
 tot_param_count = len(extracted_data) * len(fields)
-print("ACCURACY: " + "{:.1f}".format((num_correct / tot_param_count) * 100) + "%")
+avg_accuracy = "{:.1f}".format((num_correct / tot_param_count) * 100)
+print("ACCURACY: " + avg_accuracy + "%")
+avg_edit_distance = "{:.3f}".format((tot_edit_dist / tot_param_count))
 print(
     "AVG EDIT DISTANCE: "
-    + "{:.3f}".format((tot_edit_dist / tot_param_count))
+    + avg_edit_distance
     + " edits"
 )
+avg_cer = "{:.3f}".format((tot_cer / tot_param_count) * 100)
 print(
     "AVG CHARACTER ERROR RATE: "
-    + "{:.3f}".format((tot_cer / tot_param_count) * 100)
+    + avg_cer
     + "%"
 )
+avg_numerical_distance = "{:.3f}".format((tot_numerical_dist / tot_param_count))
 print(
-    "AVG NUMERICAL DISTANCE: " + "{:.3f}".format((tot_numerical_dist / tot_param_count))
+    "AVG NUMERICAL DISTANCE: " + avg_numerical_distance
 )
 print()
 for i in range(len(fields)):
+    eval_params[i][0] = "{:.1f}".format((eval_params[i][0] / len(expected_data)) * 100)
+    eval_params[i][1] = "{:.3f}".format((eval_params[i][1] / len(expected_data)))
+    eval_params[i][2] = "{:.3f}".format((eval_params[i][2] / len(expected_data)) * 100)
+    eval_params[i][3] = "{:.1f}".format((eval_params[i][3] / len(expected_data)))
+    eval_params[i][4] = "{:.1f}".format(((eval_params[i][4]) / len(expected_data)) * 100)
     print(
         "Field "
         + str(fields[i])
         + " Accuracy = "
-        + "{:.1f}".format((eval_params[i][0] / len(expected_data)) * 100)
+        + eval_params[i][0]
         + "% | Avg Edit Distance: "
-        + "{:.3f}".format((eval_params[i][1] / len(expected_data)))
+        + eval_params[i][1]
         + " edits | Avg CER: "
-        + "{:.3f}".format((eval_params[i][2] / len(expected_data)) * 100)
+        + eval_params[i][2]
         + "% | Avg Numeric Distance = "
-        + "{:.1f}".format((eval_params[i][3] / len(expected_data)))
+        + eval_params[i][3]
         + " | Normalised Avg Numeric Distance = "
-        + "{:.1f}".format(((eval_params[i][4]) / len(expected_data)) * 100)
+        + eval_params[i][4]
         + "%"
     )
+
+
+fig, ax = plt.subplots()
+ax.xaxis.set_visible(False)
+ax.yaxis.set_visible(False)
+ax.set_frame_on(False)
+columns = ['Accuracy (%)', 'Avg Edit Distance (edits)', 'Avg Character Error Rate (%)', 'Avg Numeric Distance (unitless)', 'Norm Avg Numeric Distance (%)']
+fields.append("Average")
+rows = fields
+eval_params.append([avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, "NA"])
+table_data = eval_params
+table = ax.table(cellText=table_data,
+                 rowLabels=rows,
+                 colLabels=columns,
+                 cellLoc='center',
+                 loc='center')
+table.auto_set_font_size(False)
+table.set_fontsize(10)  # Set the desired font size
+table.scale(1, 1)  # Scale the table cells (width, height)
+for key, cell in table.get_celld().items():
+    if key[0] == 0 or key[1] == -1:
+        cell.set_text_props(weight='bold')
+        # cell.set_text_props(fontsize='10')
+        cell.set_facecolor('#D3D3D3')  # Light gray background for header
+    else:
+        cell.set_edgecolor('black')  # Black border for cells
+        cell.set_linewidth(0.5)  # Border line width
+final_row_idx = len(rows)
+for col_idx in range(len(columns)):
+    cell = table[(final_row_idx, col_idx)]
+    cell.set_text_props(weight='bold')
+    cell.set_linewidth(1)
+
+table.auto_set_column_width(col=list(range(len(columns))))  # Adjust column widths
+plt.subplots_adjust(left=0.2, top=0.8)
+plt.show()
 
 
 # TODO calculate the odds of getting an entire row correct, not just one field in a row

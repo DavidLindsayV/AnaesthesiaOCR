@@ -88,7 +88,7 @@ def sanitycheck_data(extracted_data):
                 extracted_data[key] = extracted_data[key].split("/")[0]
             extracted_data[key] = removeNonNumberChar(extracted_data[key])
             extracted_data[key] = make_in_range(key, extracted_data[key])
-        if key == "p1.dia":
+        if key == "p1.dia": 
             if "/" in extracted_data[key]:
                 extracted_data[key] = extracted_data[key].split("/")[1]
             extracted_data[key] = removeNonNumberChar(extracted_data[key])
@@ -232,7 +232,7 @@ def extract_data(imagesDict):
 
     extracted_data = sanitycheck_data(
         extracted_data
-    )  # remove stray characters, make sure they're in the right format, etc
+    ) 
     return extracted_data
 
 

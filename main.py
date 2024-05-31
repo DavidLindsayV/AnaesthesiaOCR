@@ -78,9 +78,9 @@ def write_to_csv_all_images():
     write_to_csv(ocr_data)
     print("Completed! Time taken = " + str(datetime.now() - starttime))
 
-write_to_csv_all_images()
-# import sys
-# if len(sys.argv) > 1:
-#     test_with_img(int(sys.argv[1]))
-# else:
-#     test_with_random_image()
+# write_to_csv_all_images()
+import sys
+if len(sys.argv) > 1:
+    test_with_img(int(sys.argv[1]))
+else:
+    test_with_random_image()
