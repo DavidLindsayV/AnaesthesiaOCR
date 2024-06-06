@@ -1,4 +1,4 @@
-from PIL import Image, ImageEnhance, ImageFilter, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 import easyocr
 import numpy as np
 
@@ -49,8 +49,6 @@ def show_center_coords(center_coords, field_coords):
     img.save("field_centers.png")
 
     
-import sys
-print(sys.executable)
 global reader
 print("loading EasyOCR")
 reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory

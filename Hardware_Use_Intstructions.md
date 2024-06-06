@@ -46,7 +46,8 @@ It is recommended to use a USB stick to transfer files.
 
 To install python packages, use Pip. Please note it is slow due to its reliance on the rpi's internet connection.
 
-To install a different python version, follow the instructions present in https://hub.tcno.co/pi/software/python-update/ 
+To install a different python version, follow the instructions present in https://hub.tcno.co/pi/software/python-update/.
+I recommend when running sudo make to use one core instead of 4 to avoid crashes.
 
 ### Problems with the hardware that will need to be avoided/worked around
 
