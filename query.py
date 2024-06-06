@@ -10,7 +10,7 @@ import requests
 import easyocr
 from PIL import Image
 
-from monitor_values import OldMonitor
+from monitor_values import Field_Ranges, OldMonitor
 
 reader = None
 
@@ -24,7 +24,7 @@ def removeNonNumberChar(input):
     return re.sub(r"\D", "", input)
 
 def inRange(field, num):
-    return OldMonitor.get_field_ranges()[field][1] <= float(num) <= OldMonitor.get_field_ranges()[field][0]
+    return Field_Ranges.field_ranges[field][1] <= float(num) <= Field_Ranges.field_ranges[field][0]
 
 def make_in_range(field, num):
 
@@ -39,7 +39,7 @@ def make_in_range(field, num):
         if len(num) <= 1: #if the num is 1 character, you can't make substrings of it
             return num
         
-        if float(num) > OldMonitor.get_field_ranges()[field][0]: #If you are above the max
+        if float(num) > Field_Ranges.field_ranges[field][0]: #If you are above the max
             preNum = num[:-1]
             postNum = num[1:]
             print(preNum)

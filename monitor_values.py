@@ -1,7 +1,7 @@
 class Monitor:
     def __init__(self, field_pos, field_ranges):
         Monitor.field_pos = field_pos
-        
+
         pos_centres = {}
         for key, value in Monitor.field_pos.items():
             pos_centres[key] = [
@@ -9,16 +9,13 @@ class Monitor:
                 (value[1] + value[3]) / 2,
             ]
         Monitor.pos_centres = pos_centres
-        Monitor.field_ranges = field_ranges
 
     def get_field_pos():
         return Monitor.field_pos
-    
+
     def get_pos_centres():
         return Monitor.pos_centres
-    
-    def get_field_ranges():
-        return Monitor.field_ranges
+
 
 class OldMonitor(Monitor):
 
@@ -35,19 +32,7 @@ class OldMonitor(Monitor):
             "aa.fi": (120, 420, 160, 445),
         }
 
-        field_ranges = {
-            "ecg.hr": [180, 40],
-            "co2.et": [60, 0],
-            "co2.fi": [1, 0],
-            "co2.rr": [35, 0],
-            "p1.sys": [160, 50],
-            "p1.dia": [120, 40],
-            "p1.mean": [120, 50],
-            "aa.et": [3, 0],
-            "aa.fi": [5, 0],
-        }
-
-        super().__init__(field_pos, field_ranges)
+        super().__init__(field_pos)
 
 
 class HospitalMonitor(Monitor):
@@ -65,19 +50,21 @@ class HospitalMonitor(Monitor):
             "aa.fi": (120, 420, 160, 445),
         }
 
-        field_ranges = {
-            "ecg.hr": [180, 40],
-            "co2.et": [60, 0],
-            "co2.fi": [1, 0],
-            "co2.rr": [35, 0],
-            "p1.sys": [160, 50],
-            "p1.dia": [120, 40],
-            "p1.mean": [120, 50],
-            "aa.et": [3, 0],
-            "aa.fi": [5, 0],
-        }
+        super().__init__(field_pos)
 
-        super().__init__(field_pos, field_ranges)
+
+class Field_Ranges:
+    field_ranges = {
+        "ecg.hr": [180, 40],
+        "co2.et": [60, 0],
+        "co2.fi": [1, 0],
+        "co2.rr": [35, 0],
+        "p1.sys": [160, 50],
+        "p1.dia": [120, 40],
+        "p1.mean": [120, 50],
+        "aa.et": [3, 0],
+        "aa.fi": [5, 0],
+    }
 
 
 OldMonitor()
