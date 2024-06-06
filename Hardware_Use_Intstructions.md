@@ -33,6 +33,10 @@ This is the program main.py running and taking images
   You need to make a new terminal and run python main.py
 - Remember to take the cap off the camera so that images can be seen
 
+## To adjust camera focus
+
+- On the camera, twist the lens clockwise or counterclockwise to adjust the focus. Twisting counterclockwise brings the focus closer, twisting clockwise pushes the focus further out.
+
 ### Problems with the hardware that will need to be avoided/worked around
 
 - The camera cable is exposed - be careful with it.
