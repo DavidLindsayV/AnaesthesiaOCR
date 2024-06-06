@@ -93,7 +93,7 @@ eval_params = [
 ]  # this is a 2d array. The first index is what the field is. The second array is of [count_of_correct_ocr, total_edit_distance, total_cer, tot_numeric_dist, tot_numeric_dist_normalised]
 
 # Estimates for the ranges of each physiological parameter. Note, these are ESTIMATES  TODO double check these estimates??
-field_ranges = OldMonitor.field_ranges
+field_ranges = OldMonitor.get_field_ranges()
 
 for i in range(len(extracted_data)):
     # print(expected_data[i])

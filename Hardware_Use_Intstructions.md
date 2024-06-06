@@ -37,6 +37,17 @@ This is the program main.py running and taking images
 
 - On the camera, twist the lens clockwise or counterclockwise to adjust the focus. Twisting counterclockwise brings the focus closer, twisting clockwise pushes the focus further out.
 
+## To add files onto the raspberry pi
+
+You can use the internet to transfer files, but this is extremely slow.
+It is recommended to use a USB stick to transfer files.
+
+## Installing python versions/packages
+
+To install python packages, use Pip. Please note it is slow due to its reliance on the rpi's internet connection.
+
+To install a different python version, follow the instructions present in https://hub.tcno.co/pi/software/python-update/ 
+
 ### Problems with the hardware that will need to be avoided/worked around
 
 - The camera cable is exposed - be careful with it.

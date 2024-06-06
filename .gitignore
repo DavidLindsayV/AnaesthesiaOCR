@@ -7,3 +7,4 @@ oriented_images/*
 __pycache__/process_img.cpython-312.pyc
 __pycache__/process_img.cpython-312.pyc
 bboxImgs/*
+pip_packages/*

@@ -6,7 +6,6 @@ import os
 import cv2
 import numpy as np
 from PIL import Image
-from deskew import determine_skew
 from typing import Tuple, Union
 import math
 from skimage import io, restoration, img_as_ubyte
@@ -173,7 +172,7 @@ def dist_to_bbox(point, bbox):
 def get_field_cropped_imgs(image):
     fieldCroppingMode = "BBox_Detection_Old_Monitor"
 
-    oldMonitor_Fieldpos = OldMonitor.field_pos
+    oldMonitor_Fieldpos = OldMonitor.get_field_pos()
     imageDict = {}
 
     if fieldCroppingMode == "Manual_Old_Monitor":
