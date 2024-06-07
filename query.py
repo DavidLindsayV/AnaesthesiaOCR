@@ -23,51 +23,59 @@ reader = None
 def removeNonNumberChar(input):
     return re.sub(r"\D", "", input)
 
+
 def inRange(field, num):
-    return Field_Ranges.field_ranges[field][1] <= float(num) <= Field_Ranges.field_ranges[field][0]
+    return (
+        Field_Ranges.field_ranges[field][1]
+        <= float(num)
+        <= Field_Ranges.field_ranges[field][0]
+    )
+
 
 def make_in_range(field, num):
 
-    try: #check that num can be read as a number
+    try:  # check that num can be read as a number
         float(num)
     except ValueError:
         return num
-    
+
     if inRange(field, num):
         return num
     else:
-        if len(num) <= 1: #if the num is 1 character, you can't make substrings of it
+        if len(num) <= 1:  # if the num is 1 character, you can't make substrings of it
             return num
-        
-        if float(num) > Field_Ranges.field_ranges[field][0]: #If you are above the max
+
+        if float(num) > Field_Ranges.field_ranges[field][0]:  # If you are above the max
             preNum = num[:-1]
             postNum = num[1:]
             print(preNum)
             print(postNum)
-            #If removing the first or last character makes the number in the correct range, and  you can clearly tell which to remove
+            # If removing the first or last character makes the number in the correct range, and  you can clearly tell which to remove
             if inRange(field, preNum) and not inRange(field, postNum):
                 return preNum
             if inRange(field, postNum) and not inRange(field, preNum):
                 return postNum
-            #If it begins or ends with '1' (a common misread of ')' or '/')
-            if num.endswith('1') and inRange(field, preNum):
+            # If it begins or ends with '1' (a common misread of ')' or '/')
+            if num.endswith("1") and inRange(field, preNum):
                 return preNum
-            if num.startswith('1') and inRange(field, postNum):
+            if num.startswith("1") and inRange(field, postNum):
                 return postNum
-            if inRange(field, preNum) and inRange(field, postNum): #if both are valid, choose the one which removes the first character TODO this is arbitrary
+            if inRange(field, preNum) and inRange(
+                field, postNum
+            ):  # if both are valid, choose the one which removes the first character TODO this is arbitrary
                 return postNum
-        #Give up, you can't make this number fit the range
+        # Give up, you can't make this number fit the range
         print("Failed to make into correct range: " + field + " " + num)
-        return num 
-        
+        return num
+
 
 def sanitycheck_data(extracted_data):
     print("Data pre-sanity check:")
     print(extracted_data)
 
     for key in extracted_data.keys():
-        extracted_data[key] = extracted_data[key].replace('O', '0')
-        extracted_data[key] = extracted_data[key].replace('B', '8')
+        extracted_data[key] = extracted_data[key].replace("O", "0")
+        extracted_data[key] = extracted_data[key].replace("B", "8")
         if not any(
             char.isdigit() for char in extracted_data[key]
         ):  # If the string is horribly wrong, or is empty, or is ---
@@ -82,13 +90,15 @@ def sanitycheck_data(extracted_data):
             )  # remove any non-number characters
             extracted_data[key] = make_in_range(key, extracted_data[key])
         if key == "p1.mean":
-            extracted_data[key] = "(" + make_in_range(key, removeNonNumberChar(extracted_data[key])) + ")"
+            extracted_data[key] = (
+                "(" + make_in_range(key, removeNonNumberChar(extracted_data[key])) + ")"
+            )
         if key == "p1.sys":
             if "/" in extracted_data[key]:
                 extracted_data[key] = extracted_data[key].split("/")[0]
             extracted_data[key] = removeNonNumberChar(extracted_data[key])
             extracted_data[key] = make_in_range(key, extracted_data[key])
-        if key == "p1.dia": 
+        if key == "p1.dia":
             if "/" in extracted_data[key]:
                 extracted_data[key] = extracted_data[key].split("/")[1]
             extracted_data[key] = removeNonNumberChar(extracted_data[key])
@@ -230,9 +240,7 @@ def extract_data(imagesDict):
             else:
                 extracted_data[key] = ""
 
-    extracted_data = sanitycheck_data(
-        extracted_data
-    ) 
+    extracted_data = sanitycheck_data(extracted_data)
     return extracted_data
 
 

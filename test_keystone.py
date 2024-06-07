@@ -27,7 +27,7 @@ cv2.setMouseCallback('src', srcMouse, 0)
 cv2.namedWindow('dst')
 cv2.setMouseCallback('dst', dstMouse, 0)
 
-im = cv2.imread('image.png')
+im = cv2.imread(os.path.join("misc_images", 'image.png'))
 dst = np.zeros(im.shape,dtype=np.uint8)
 while(1):
     imD = im.copy()

@@ -1,8 +1,9 @@
+import os
 from PIL import Image, ImageDraw, ImageFont
 import easyocr
 import numpy as np
 
-from monitor_values import OldMonitor
+from monitor_values import HospitalMonitor, OldMonitor
 
 def draw_boxes(image, box, text):
     draw = ImageDraw.Draw(image)
@@ -37,7 +38,7 @@ def show_bboxes(center_coords):
         new_img.save("bboxImgs/new_image" + str(q) + ".png")
 
 def show_center_coords(center_coords, field_coords):
-    img = Image.open("image.png")
+    img = Image.open(os.path.join("misc_images", "image.png"))
     img = img.transpose(Image.FLIP_TOP_BOTTOM)
     img = img.transpose(Image.FLIP_LEFT_RIGHT)
     extracted_data = []
@@ -48,12 +49,22 @@ def show_center_coords(center_coords, field_coords):
         img = draw_boxes(img, field_coords[key], '')
     img.save("field_centers.png")
 
+def show_hospital_monitor_bboxes():
+    field_coords = HospitalMonitor.get_field_pos()
+    img = Image.open(os.path.join("misc_images", "hospital_monitor_photo.jpg"))
+    img = img.transpose(Image.FLIP_TOP_BOTTOM)
+    img = img.transpose(Image.FLIP_LEFT_RIGHT)
+    extracted_data = []
+    for key in field_coords.keys():
+        img = draw_boxes(img, field_coords[key], key)
+    img.save("field_centers.png")
     
 global reader
 print("loading EasyOCR")
 reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory
 
-center_coords = OldMonitor.get_pos_centres()
-field_coords = OldMonitor.get_field_pos()
+# center_coords = OldMonitor.get_pos_centres()
+# field_coords = OldMonitor.get_field_pos()
 # show_center_coords(center_coords, field_coords)
-show_bboxes(center_coords)
+# show_bboxes(center_coords)
+show_hospital_monitor_bboxes()

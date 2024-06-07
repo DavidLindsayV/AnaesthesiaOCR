@@ -6,6 +6,7 @@ from nltk.metrics.distance import edit_distance
 import csv
 from jiwer import cer
 import matplotlib.pyplot as plt
+import os
 
 from monitor_values import Field_Ranges
 
@@ -28,7 +29,7 @@ fields = [
 # aa.fi 93
 
 extracted_data = []
-with open("easyocr_96.3.csv", "r") as file:
+with open(os.path.join("accuracy_result_csvs", "easyocr_96.3.csv"), "r") as file:
     csvreader = csv.reader(file)
     firstrow = True
     columns = []
@@ -95,6 +96,13 @@ eval_params = [
 # Estimates for the ranges of each physiological parameter. Note, these are ESTIMATES  TODO double check these estimates??
 field_ranges = Field_Ranges.field_ranges
 
+def is_float(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
 for i in range(len(extracted_data)):
     # print(expected_data[i])
     # print(extracted_data[i])
@@ -110,7 +118,7 @@ for i in range(len(extracted_data)):
         tot_cer += cer(exp, extr)
         eval_params[j][1] += edit_distance(exp, extr)
         eval_params[j][2] += cer(exp, extr)
-        if re.search(r"[-+]?\d*\.?\d+", extr) and re.search(r"[-+]?\d*\.?\d+", exp):
+        if is_float(extr) and is_float(exp):
             exp = re.sub(r"[^0-9.]", "", exp)
             extr = re.sub(r"[^0-9.]", "", extr)
             tot_numerical_dist += abs(float(exp) - float(extr))
