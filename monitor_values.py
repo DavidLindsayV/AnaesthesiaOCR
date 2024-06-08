@@ -40,7 +40,7 @@ class HospitalMonitor(Monitor):
     def __init__(self):
         field_pos = {
             "ecg.hr": (185, 35, 300, 125),
-            "spo2.ir": (355, 35, 465, 115),
+            "spo2.pr": (355, 35, 465, 115),
             "spo2.SpO2": (205, 190, 310, 260),
             "p1.sys": (220, 250, 280, 290),
             "p1.dia": (280, 250, 330, 290),
@@ -67,7 +67,8 @@ class Field_Ranges:
         "p1.mean": [120, 50],
         "aa.et": [3, 0],
         "aa.fi": [5, 0],
-        "spo2.SpO2": [40, 100]
+        "spo2.SpO2": [40, 100],
+        "spo2.pr": [0, 160],
     }
 
 
