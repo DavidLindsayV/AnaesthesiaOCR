@@ -1,7 +1,5 @@
 import re
 import sys
-import numpy as np
-import pandas as pd
 from nltk.metrics.distance import edit_distance
 import csv
 from jiwer import cer

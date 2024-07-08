@@ -1,14 +1,15 @@
 easyocr==1.7.1
-jiwer==3.0.4
 matplotlib==3.8.1
-nanonets
-nltk==3.8.1
 numpy==1.26.4
-ocr_nanonets_wrapper
 opencv_python==4.8.1.78
 opencv_python_headless==4.9.0.80
 openpyxl==3.1.2
-pandas==2.2.2
 Pillow==10.3.0
+# Accuracy checking:
+jiwer==3.0.4
+nltk==3.8.1
+# AI models
+nanonets
+ocr_nanonets_wrapper
 pytesseract==0.3.10
 Requests
