@@ -46,7 +46,7 @@ print("Extracted data loaded")
 
 import openpyxl
 
-dataframe = openpyxl.load_workbook("monitor_data.xlsx")
+dataframe = openpyxl.load_workbook(os.path.join("images","monitor_data.xlsx"))
 dataframe1 = dataframe.active
 firstrow = True
 end_of_data_reached = False
@@ -56,6 +56,7 @@ for row in range(0, dataframe1.max_row):
     if firstrow:
         firstrow = False
         for col in dataframe1.iter_cols(1, dataframe1.max_column):
+            print(col[row].value)
             columns.append(col[row].value)
         continue
     row_data = [None for x in range(len(fields))]
@@ -70,6 +71,7 @@ for row in range(0, dataframe1.max_row):
     expected_data.append(row_data)
 
 print("Expected data loaded")
+print(expected_data)
 
 if len(expected_data) != len(extracted_data):
     print(

@@ -1,5 +1,6 @@
 import os
 import random
+from monitor_values import HospitalMonitor, OldMonitor
 from process_img import process_img
 from query import extract_data
 from write_to_csv import write_to_csv
@@ -62,25 +63,37 @@ def test_with_random_image():
     imgNum = random.randint(1, 182)
     test_with_img(imgNum)
 
-def write_to_csv_all_images():
+def write_to_csv_all_images(img_folder):
+    dir = os.path.join("images", img_folder)
+
+    monitor = HospitalMonitor
+    if img_folder == "oldmonitor_images":
+        monitor = OldMonitor
+
+    bbox_adjustment = True
+
     starttime = datetime.now()
     ocr_data = []
-    num_images = len(os.listdir("images"))
+    num_images = len(os.listdir(dir))
     count = 1
-    num_images = len(os.listdir("images"))
+    num_images = len(os.listdir(dir))
     for i in range(1, num_images + 1):
         print("Processing image " + str(count) + "/" + str(num_images))
         count += 1
-        filename = os.path.join("images", str(i) + "tmp.jpg")
-        imagesDict = process_img(filename)
+        filename = os.path.join(dir, str(i) + "tmp.jpg")
+        imagesDict = process_img(filename, monitor, bbox_adjustment)
         print(filename)
         ocr_data.append(extract_data(imagesDict))
     write_to_csv(ocr_data)
     print("Completed! Time taken = " + str(datetime.now() - starttime))
 
-write_to_csv_all_images()
-# import sys
+import sys
 # if len(sys.argv) > 1:
 #     test_with_img(int(sys.argv[1]))
 # else:
 #     test_with_random_image()
+
+if len(sys.argv) >= 1:
+    write_to_csv_all_images(sys.argv[1])
+else:
+    print("Need to know what images to make into csv")

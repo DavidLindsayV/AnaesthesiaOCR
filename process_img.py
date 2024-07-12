@@ -10,7 +10,6 @@ from typing import Tuple, Union
 import math
 from skimage import io, restoration, img_as_ubyte
 
-from monitor_values import OldMonitor
 from query import find_bboxes
 
 
@@ -169,19 +168,19 @@ def dist_to_bbox(point, bbox):
             # Point is directly below the box
             return py - y_max
 
-def get_field_cropped_imgs(image):
-    fieldCroppingMode = "BBox_Detection_Old_Monitor"
+def get_field_cropped_imgs(image, monitor, bbox_adjustment):
+    
 
-    oldMonitor_Fieldpos = OldMonitor.get_field_pos()
+    fieldpos = monitor.get_field_pos()
     imageDict = {}
 
-    if fieldCroppingMode == "Manual_Old_Monitor":
-        for key, box in oldMonitor_Fieldpos.items():
+    if not bbox_adjustment:
+        for key, box in fieldpos.items():
             imageDict[key] = image.crop(box)
 
-    elif fieldCroppingMode == "BBox_Detection_Old_Monitor":
+    elif bbox_adjustment:
         center_coords = {}
-        for key, box in oldMonitor_Fieldpos.items():
+        for key, box in fieldpos.items():
             center_coords[key] = ((box[0] + box[2]) / 2, (box[1] + box[3]) / 2)
 
         bboxes = find_bboxes(image)
@@ -209,7 +208,7 @@ def get_field_cropped_imgs(image):
                 ymin = bbox.box[1] 
                 xmax = bbox.box[2] 
                 ymax = bbox.box[3] 
-                if xmin <= coords[0] <= xmax and ymin <= coords[1] <= ymax and dist_to_bbox(coords, bbox.box) < 0.5*(oldMonitor_Fieldpos[field][3] - oldMonitor_Fieldpos[field][1]):
+                if xmin <= coords[0] <= xmax and ymin <= coords[1] <= ymax and dist_to_bbox(coords, bbox.box) < 0.5*(fieldpos[field][3] - fieldpos[field][1]):
                     if not field in bestBBox.keys():
                         bestBBox[field] = bbox.box
                     else:
@@ -219,10 +218,10 @@ def get_field_cropped_imgs(image):
                         ) * (bestBBox[field][3] - bestBBox[field][1]):
                             bestBBox[field] = bbox.box
 
-        for field in oldMonitor_Fieldpos.keys():
+        for field in fieldpos.keys():
             if not field in bestBBox.keys():
                 print("No bbox found for " + field)
-                bestBBox[field] = oldMonitor_Fieldpos[field]
+                bestBBox[field] = fieldpos[field]
             
         #manual fix for co2.rr being misread because it includes co2.fi
         if bestBBox['co2.rr'][0] < center_coords['co2.fi'][0] < bestBBox['co2.rr'][2] and bestBBox['co2.rr'][1] < center_coords['co2.fi'][1] < bestBBox['co2.rr'][3]:
@@ -237,7 +236,7 @@ def get_field_cropped_imgs(image):
             imageDict[field] = image.crop(bbox)
     return imageDict
 
-def get_parameter_imgs(image):
+def get_parameter_imgs(image, monitor, bbox_adjustment):
 
     ideal_height = 100
 
@@ -247,7 +246,7 @@ def get_parameter_imgs(image):
     image.save(os.path.join("processed_images", "Img.png"))
 
     origSize = image.size
-    imageDict = get_field_cropped_imgs(image)
+    imageDict = get_field_cropped_imgs(image, monitor, bbox_adjustment)
 
     for key in imageDict.keys():
 

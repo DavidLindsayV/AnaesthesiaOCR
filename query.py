@@ -10,7 +10,7 @@ import requests
 import easyocr
 from PIL import Image
 
-from monitor_values import Field_Ranges, OldMonitor
+from monitor_values import Field_Ranges
 
 reader = None
 
