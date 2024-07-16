@@ -7,25 +7,11 @@ import matplotlib.pyplot as plt
 import os
 import openpyxl
 
-from monitor_values import Field_Ranges
+from monitor_values import Field_Ranges, HospitalMonitor, OldMonitor
 
-
-fields = [
-    "ecg.hr",
-    "co2.et",
-    "co2.fi",
-    "co2.rr",
-    "p1.sys",
-    "p1.dia",
-    "p1.mean",
-    "aa.et",
-    "aa.fi",
-]
-
-
-def get_extracted_data():
+def get_extracted_data(extracted_data_path, fields):
     extracted_data = []
-    with open(os.path.join("accuracy_result_csvs", "easyocr_96.3.csv"), "r") as file:
+    with open(extracted_data_path, "r") as file:
         csvreader = csv.reader(file)
         firstrow = True
         columns = []
@@ -44,9 +30,9 @@ def get_extracted_data():
     return extracted_data
 
 
-def get_expected_data():
+def get_expected_data(expected_data_sheet, fields):
     dataframe = openpyxl.load_workbook(os.path.join("images", "monitor_data.xlsx"))
-    dataframe1 = dataframe["OldMonitor"]
+    dataframe1 = dataframe[expected_data_sheet]
     # expected_data = pd.read_excel(os.path.join("images","monitor_data.xlsx"), sheet_name="OldMonitor")
     firstrow = True
     end_of_data_reached = False
@@ -81,7 +67,7 @@ def is_float(string):
         return False
 
 
-def calculate_accuracy_metrics(extracted_data, expected_data):
+def calculate_accuracy_metrics(extracted_data, expected_data, fields):
     num_correct = 0
     tot_edit_dist = 0
     tot_cer = 0
@@ -125,7 +111,7 @@ def calculate_accuracy_metrics(extracted_data, expected_data):
 
     return avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, image_count, eval_params
 
-def print_accuracy_metrics(avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, eval_params, image_count):
+def print_accuracy_metrics(avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, eval_params, image_count, fields):
     print()
     print("ACCURACY: " + avg_accuracy + "%")
     print("AVG EDIT DISTANCE: " + avg_edit_distance + " edits")
@@ -156,7 +142,7 @@ def print_accuracy_metrics(avg_accuracy, avg_edit_distance, avg_cer, avg_numeric
             + "%"
         )
 
-def create_accuracy_pyplot(avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, eval_params):
+def create_accuracy_pyplot(avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, eval_params, fields):
     fig, ax = plt.subplots()
     ax.xaxis.set_visible(False)
     ax.yaxis.set_visible(False)
@@ -203,9 +189,18 @@ def create_accuracy_pyplot(avg_accuracy, avg_edit_distance, avg_cer, avg_numeric
     plt.show()
 
 
-def calculate_accuracy():
-    extracted_data = get_extracted_data()
-    expected_data = get_expected_data()
+def calculate_accuracy(extracted_data_path, expected_data_sheet):
+    monitor = HospitalMonitor()
+    print(expected_data_sheet
+          )
+    if expected_data_sheet == "OldMonitor":
+        print('hhh')
+        monitor = OldMonitor()
+    fields = list(monitor.get_field_pos().keys())
+    print(fields)
+
+    extracted_data = get_extracted_data(extracted_data_path, fields)
+    expected_data = get_expected_data(expected_data_sheet, fields)
     if len(expected_data) != len(extracted_data):
         print(
             "ERROR: Length of expected data doesn't match length of extracted data. Ending program"
@@ -219,13 +214,18 @@ def calculate_accuracy():
         + str(len(expected_data))
     )
 
-    avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, image_count, eval_params = calculate_accuracy_metrics(extracted_data, expected_data)
+    avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, image_count, eval_params = calculate_accuracy_metrics(extracted_data, expected_data, fields)
 
-    print_accuracy_metrics(avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, eval_params, image_count)
-    create_accuracy_pyplot(avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, eval_params)
+    print_accuracy_metrics(avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, eval_params, image_count, fields)
+    create_accuracy_pyplot(avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, eval_params, fields)
 
     
-calculate_accuracy()
+if len(sys.argv) == 3:
+    calculate_accuracy(sys.argv[1], sys.argv[2])
+else:
+    print (sys.argv)
+    print("Need to enter 2 cmd arguments: First is the csv file of the OCR outputs, the second is what sheet in the excel file has the image data")
+    print("Options for image data: OldMonitor, NormalHospital, RepositionedCameraHospital, DarkHospital, BrightReflectionHospital")
 
 
 # TODO calculate the odds of getting an entire row correct, not just one field in a row
