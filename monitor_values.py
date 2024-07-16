@@ -1,26 +1,24 @@
 class Monitor:
     def __init__(self, field_pos):
-        Monitor.field_pos = field_pos
-
         pos_centres = {}
-        for key, value in Monitor.field_pos.items():
+        for key, value in field_pos.items():
             pos_centres[key] = [
                 (value[0] + value[2]) / 2,
                 (value[1] + value[3]) / 2,
             ]
-        Monitor.pos_centres = pos_centres
+        self.pos_centres = pos_centres
 
-    def get_field_pos():
-        return Monitor.field_pos
+    def get_field_pos(self):
+        return self.field_pos
 
-    def get_pos_centres():
-        return Monitor.pos_centres
+    def get_pos_centres(self):
+        return self.pos_centres
 
 
 class OldMonitor(Monitor):
 
     def __init__(self):
-        field_pos = {
+        self.field_pos = {
             "ecg.hr": (500, 160, 580, 230),
             "co2.et": (465, 330, 510, 365),
             "co2.fi": (470, 365, 500, 390),
@@ -32,13 +30,13 @@ class OldMonitor(Monitor):
             "aa.fi": (120, 420, 160, 445),
         }
 
-        super().__init__(field_pos)
+        super().__init__(self.field_pos)
 
 
 class HospitalMonitor(Monitor):
 
     def __init__(self):
-        field_pos = {
+        self.field_pos = {
             "ecg.hr": (230, 40, 330, 110),
             "spo2.pr": (410, 50, 520, 120),
             "spo2.SpO2": (240, 190, 330, 245),
@@ -53,7 +51,7 @@ class HospitalMonitor(Monitor):
             "aa.fi": (385, 350, 425, 370),
         }
 
-        super().__init__(field_pos)
+        super().__init__(self.field_pos)
 
 
 class Field_Ranges:
@@ -70,7 +68,3 @@ class Field_Ranges:
         "spo2.SpO2": [40, 100],
         "spo2.pr": [0, 160],
     }
-
-
-OldMonitor()
-HospitalMonitor()

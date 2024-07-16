@@ -5,6 +5,7 @@ from process_img import process_img
 from query import extract_data
 from write_to_csv import write_to_csv
 from datetime import datetime
+import sys
 
 
 def checkAnswers(extracted_data):
@@ -52,7 +53,7 @@ def test_with_one_image():
     print("Time taken to perform AI OCR = " + str(datetime.now() - time))
     checkAnswers(extracted_data[0])
 
-def test_with_img(imgNum):
+def test_with_img(imgNum): #TODO update this to work with other image folders
     imagesDict = process_img(os.path.join("images", str(imgNum) + "tmp.jpg"))
     time = datetime.now()
     extracted_data = [extract_data(imagesDict)]
@@ -66,9 +67,9 @@ def test_with_random_image():
 def write_to_csv_all_images(img_folder):
     dir = os.path.join("images", img_folder)
 
-    monitor = HospitalMonitor
+    monitor = HospitalMonitor()
     if img_folder == "oldmonitor_images":
-        monitor = OldMonitor
+        monitor = OldMonitor()
 
     bbox_adjustment = True
 
@@ -87,13 +88,12 @@ def write_to_csv_all_images(img_folder):
     write_to_csv(ocr_data)
     print("Completed! Time taken = " + str(datetime.now() - starttime))
 
-import sys
 # if len(sys.argv) > 1:
 #     test_with_img(int(sys.argv[1]))
 # else:
 #     test_with_random_image()
 
-if len(sys.argv) >= 1:
+if len(sys.argv) >= 2:
     write_to_csv_all_images(sys.argv[1])
 else:
-    print("Need to know what images to make into csv")
+    print("Need to know what images to make into csv. Provide one command line argument, one of the names of the image subfolders within the image folder")

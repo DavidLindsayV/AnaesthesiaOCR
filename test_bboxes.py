@@ -50,8 +50,8 @@ def show_center_coords(center_coords, field_coords):
     img.save("field_centers.png")
 
 def show_hospital_monitor_bboxes():
-    field_coords = HospitalMonitor.get_field_pos()
-    img = Image.open(os.path.join("misc_images", "hospital_monitor_photo.jpg"))
+    field_coords = HospitalMonitor().get_field_pos()
+    img = Image.open(os.path.join("images", "normalhospital_images", "33tmp.jpg"))
     img = img.transpose(Image.FLIP_TOP_BOTTOM)
     img = img.transpose(Image.FLIP_LEFT_RIGHT)
     extracted_data = []
