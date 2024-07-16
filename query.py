@@ -80,7 +80,7 @@ def sanitycheck_data(extracted_data):
             char.isdigit() for char in extracted_data[key]
         ):  # If the string is horribly wrong, or is empty, or is ---
             extracted_data[key] = (
-                "---"  # easyOCR often reads --- as empty string. This fixes that problem
+                "---"  # easyOCR often reads --- as empty string. This fixes that problem TODO fix this to work with oldmonitor and new
             )
             continue
 
