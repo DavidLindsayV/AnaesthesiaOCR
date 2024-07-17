@@ -63,12 +63,13 @@ def test_with_img(imgPath):
     imgNum = imgPath.split(os.path.sep)[-1].replace("tmp.jpg", "")
     sheet_name = get_sheet_name_from_folder_path(imgPath)
     expected_data = get_expected_data_row(sheet_name, list(extracted_data[0].keys()), imgNum)
-    print(expected_data)
     checkAnswersForImg(imgNum, extracted_data[0], expected_data)
 
-def test_with_random_image():
-    imgNum = random.randint(1, 182)
-    test_with_img(imgNum)
+def test_with_random_image(imgFolder):
+    path = os.path.join("images", imgFolder)
+    num_images = len(os.listdir(dir))
+    imgNum = random.randint(1, num_images)
+    test_with_img(os.path.join(path, imgNum + "tmp.jpg"))
 
 def write_to_csv_all_images(img_folder):
     dir = os.path.join("images", img_folder)
@@ -81,7 +82,6 @@ def write_to_csv_all_images(img_folder):
 
     starttime = datetime.now()
     ocr_data = []
-    num_images = len(os.listdir(dir))
     count = 1
     num_images = len(os.listdir(dir))
     for i in range(1, num_images + 1):
@@ -95,14 +95,17 @@ def write_to_csv_all_images(img_folder):
     print("Completed! Time taken = " + str(datetime.now() - starttime))
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        test_with_img(sys.argv[1])
-    else:
-        print("Need to know the path to the image to test")
-
-    # test_with_random_image() TODO update this to take cmd args
-
-    # if len(sys.argv) >= 2:
-    #     write_to_csv_all_images(sys.argv[1])
+    # if len(sys.argv) > 1:
+    #     test_with_img(sys.argv[1])
     # else:
-    #     print("Need to know what images to make into csv. Provide one command line argument, one of the names of the image subfolders within the image folder")
+    #     print("Need to know the path to the image to test")
+
+    # if len(sys.argv) == 2:
+    #     test_with_random_image(sys.argv[1]) 
+    # else:
+    #     print("Need to know what folder of images to choose randomly from. Choose one of the subfolder names within images folder")
+
+    if len(sys.argv) >= 2:
+        write_to_csv_all_images(sys.argv[1])
+    else:
+        print("Need to know what images to make into csv. Provide one command line argument, one of the names of the image subfolders within the image folder")
