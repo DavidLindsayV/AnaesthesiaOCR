@@ -65,6 +65,6 @@ class Field_Ranges:
         "p1.mean": [120, 50],
         "aa.et": [3, 0],
         "aa.fi": [5, 0],
-        "spo2.SpO2": [40, 100],
-        "spo2.pr": [0, 160],
+        "spo2.SpO2": [100, 40],
+        "spo2.pr": [160, 0],
     }
