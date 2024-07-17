@@ -29,6 +29,33 @@ def get_extracted_data(extracted_data_path, fields):
     print("Extracted data loaded")
     return extracted_data
 
+def get_expected_data_row(expected_data_sheet, fields, row_num):
+    row_num = int(row_num)
+    dataframe = openpyxl.load_workbook(os.path.join("images", "monitor_data.xlsx"))
+    dataframe1 = dataframe[expected_data_sheet]
+    firstrow = True
+    end_of_data_reached = False
+    columns = []
+    expected_data = []
+    for row in range(0, dataframe1.max_row):
+        if firstrow:
+            firstrow = False
+            for col in dataframe1.iter_cols(1, dataframe1.max_column):
+                print(col[row].value)
+                columns.append(col[row].value)
+            continue
+        if row == row_num:
+            row_data = [None for x in range(len(fields))]
+            row_dict = {}
+            col_num = -1
+            for col in dataframe1.iter_cols(1, dataframe1.max_column):
+                col_num += 1
+                if columns[col_num] in fields:
+                    row_dict[columns[col_num]] = str(col[row].value)
+            return row_dict
+        if end_of_data_reached:
+            break
+    return None
 
 def get_expected_data(expected_data_sheet, fields):
     dataframe = openpyxl.load_workbook(os.path.join("images", "monitor_data.xlsx"))
@@ -219,13 +246,13 @@ def calculate_accuracy(extracted_data_path, expected_data_sheet):
     print_accuracy_metrics(avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, eval_params, image_count, fields)
     create_accuracy_pyplot(avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, eval_params, fields)
 
-    
-if len(sys.argv) == 3:
-    calculate_accuracy(sys.argv[1], sys.argv[2])
-else:
-    print (sys.argv)
-    print("Need to enter 2 cmd arguments: First is the csv file of the OCR outputs, the second is what sheet in the excel file has the image data")
-    print("Options for image data: OldMonitor, NormalHospital, RepositionedCameraHospital, DarkHospital, BrightReflectionHospital")
+if __name__ == "__main__":
+    if len(sys.argv) == 3:
+        calculate_accuracy(sys.argv[1], sys.argv[2])
+    else:
+        print (sys.argv)
+        print("Need to enter 2 cmd arguments: First is the csv file of the OCR outputs, the second is what sheet in the excel file has the image data")
+        print("Options for image data: OldMonitor, NormalHospital, RepositionedCameraHospital, DarkHospital, BrightReflectionHospital")
 
 
 # TODO calculate the odds of getting an entire row correct, not just one field in a row
