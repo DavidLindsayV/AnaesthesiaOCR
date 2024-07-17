@@ -84,36 +84,31 @@ def sanitycheck_data(extracted_data):
             )
             continue
 
-        if key == "ecg.hr" or key == "co2.et":
-            extracted_data[key] = removeNonNumberChar(
-                extracted_data[key]
-            )  # remove any non-number characters
-            extracted_data[key] = make_in_range(key, extracted_data[key])
         if key == "p1.mean":
             extracted_data[key] = (
                 "(" + make_in_range(key, removeNonNumberChar(extracted_data[key])) + ")"
             )
-        if key == "p1.sys":
+        elif key == "p1.sys":
             if "/" in extracted_data[key]:
                 extracted_data[key] = extracted_data[key].split("/")[0]
             extracted_data[key] = removeNonNumberChar(extracted_data[key])
             extracted_data[key] = make_in_range(key, extracted_data[key])
-        if key == "p1.dia":
+        elif key == "p1.dia":
             if "/" in extracted_data[key]:
                 extracted_data[key] = extracted_data[key].split("/")[1]
             extracted_data[key] = removeNonNumberChar(extracted_data[key])
             extracted_data[key] = make_in_range(key, extracted_data[key])
-        if key == "co2.rr":
+        elif key == "co2.rr":
             if " " in extracted_data[key]:
                 extracted_data[key] = extracted_data[key].split(" ")[1]
             extracted_data[key] = removeNonNumberChar(extracted_data[key])
             extracted_data[key] = make_in_range(key, extracted_data[key])
-        if key == "co2.fi":
+        elif key == "co2.fi":
             if " " in extracted_data[key]:
                 extracted_data[key] = extracted_data[key].split(" ")[0]
             extracted_data[key] = removeNonNumberChar(extracted_data[key])
             extracted_data[key] = make_in_range(key, extracted_data[key])
-        if key == "aa.et" or key == "aa.fi":
+        elif key == "aa.et" or key == "aa.fi":
             extracted_data[key] = re.sub(r"[^\d.]", "", extracted_data[key])
             if not "." in extracted_data[key] and len(extracted_data[key]) > 1:
                 extracted_data[key] = (
@@ -121,6 +116,12 @@ def sanitycheck_data(extracted_data):
                 )
             elif not "." in extracted_data[key] and len(extracted_data[key]) == 1:
                 extracted_data[key] = extracted_data[key][0] + ".0"
+            extracted_data[key] = make_in_range(key, extracted_data[key])
+        else:
+            # key == "ecg.hr" or key == "co2.et" or key == "spo2.pr" or key == "spo2.SpO2":
+            extracted_data[key] = removeNonNumberChar(
+                extracted_data[key]
+            )  # remove any non-number characters
             extracted_data[key] = make_in_range(key, extracted_data[key])
 
     return extracted_data
@@ -223,7 +224,6 @@ def extract_data(imagesDict):
 
         for key, value in filenames.items():
             text = pytesseract.image_to_string(value, lang="eng")
-            print(key + " value=" + text)
             extracted_data[key] = text
 
     elif model == "EasyOCR":
