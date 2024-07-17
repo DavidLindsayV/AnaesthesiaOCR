@@ -48,8 +48,8 @@ def make_in_range(field, num):
         if float(num) > Field_Ranges.field_ranges[field][0]:  # If you are above the max
             preNum = num[:-1]
             postNum = num[1:]
-            print(preNum)
-            print(postNum)
+            # print(preNum)
+            # print(postNum)
             # If removing the first or last character makes the number in the correct range, and  you can clearly tell which to remove
             if inRange(field, preNum) and not inRange(field, postNum):
                 return preNum
@@ -119,6 +119,8 @@ def sanitycheck_data(extracted_data):
                 extracted_data[key] = (
                     extracted_data[key][0] + "." + extracted_data[key][1:]
                 )
+            elif not "." in extracted_data[key] and len(extracted_data[key]) == 1:
+                extracted_data[key] = extracted_data[key][0] + ".0"
             extracted_data[key] = make_in_range(key, extracted_data[key])
 
     return extracted_data
