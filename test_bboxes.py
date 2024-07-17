@@ -59,12 +59,14 @@ def show_hospital_monitor_bboxes():
         img = draw_boxes(img, field_coords[key], key)
     img.save("field_centers.png")
     
-global reader
-print("loading EasyOCR")
-reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory
 
-# center_coords = OldMonitor.get_pos_centres()
-# field_coords = OldMonitor.get_field_pos()
-# show_center_coords(center_coords, field_coords)
-# show_bboxes(center_coords)
-show_hospital_monitor_bboxes()
+if __name__ == "__main__":
+    global reader
+    print("loading EasyOCR")
+    reader = easyocr.Reader(['en']) # this needs to run only once to load the model into memory
+
+    # center_coords = OldMonitor.get_pos_centres()
+    # field_coords = OldMonitor.get_field_pos()
+    # show_center_coords(center_coords, field_coords)
+    # show_bboxes(center_coords)
+    show_hospital_monitor_bboxes()
