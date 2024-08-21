@@ -9,4 +9,4 @@ bboxImgs/*
 pip_packages/*
 __pycache__/*
 *.pyc
-*/~$monitor_data.xslx
+*/~$monitor_data.xlsx
