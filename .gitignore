@@ -9,4 +9,3 @@ bboxImgs/*
 pip_packages/*
 __pycache__/*
 *.pyc
-images/*
