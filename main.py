@@ -84,15 +84,21 @@ def write_to_csv_all_images(img_folder):
     ocr_data = []
     count = 1
     num_images = len(os.listdir(dir))
+    maxImageTime = starttime - starttime
     for i in range(1, num_images + 1):
+        imagestarttime = datetime.now()
         print("Processing image " + str(count) + "/" + str(num_images))
         count += 1
         filename = os.path.join(dir, str(i) + "tmp.jpg")
         imagesDict = process_img(filename, monitor, bbox_adjustment)
-        print(filename)
+        imageFinishedTime = datetime.now()
+        if (imageFinishedTime - imagestarttime) > maxImageTime:
+            maxImageTime = (imageFinishedTime - imagestarttime)
+        print(filename + " Time taken: " + str(imageFinishedTime - imagestarttime))
         ocr_data.append(extract_data(imagesDict))
     write_to_csv(ocr_data)
     print("Completed! Time taken = " + str(datetime.now() - starttime))
+    print("Longest time to process an image: " + str(maxImageTime))
 
 if __name__ == "__main__":
     # if len(sys.argv) > 1:
