@@ -65,7 +65,10 @@ For 32 bit image capturing:
 These steps assume that you have already removed the RPI SD card and installed/reinstalled a 32 bit OS on it.
 
 - Copy the files within the Code_For_Image_Capture_(32_bit) folder onto the rpi, using a USB. Put them in a folder you will remember where it is. The files you have copied over should be app.py and main.py, and they should be in the same directory.
-- If you wish to set up a virtual environment, use virtualenv to set it up
+- Set up a virtual environment to allow you to install python packages easily
+install virtualenv using 'python3 -m pip install virtualenv --break-system-packages'
+Create a new virtualenv with 'python3 -m venv your_venv_name'
+Activate the virtual environment with 'source your_venv_name/bin/activate'
 - Install the needed packages using pip (it is recommended you use a terminal and run 'python main.py' and address any errors to make sure all needed packages are installed)
 - If you wish to have main.py run automatically on startup, within the home directory (whichever directory the file explorer shows has an icon of a red home on it - or whichever directory you navigate to with 'cd ~') modify the .bashrc file (use 'nano .bashrc' to modify .bashrc) to have the instructions at the bottom (before the virtual enviromnent's environment variables are exported, but after everything else)
 
