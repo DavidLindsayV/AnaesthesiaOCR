@@ -70,7 +70,7 @@ def make_in_range(field, num):
 
 
 def sanitycheck_data(extracted_data):
-    print("Data pre-sanity check:")
+    print("Data pre-sanity check:") #TODO make the sanity checking depend on monitor
     print(extracted_data)
 
     for key in extracted_data.keys():
@@ -233,12 +233,16 @@ def extract_data(imagesDict):
             reader = easyocr.Reader(
                 ["en"]
             )  # this needs to run only once to load the model into memory
+        detail = 1
         for key in imagesDict.keys():
             result = reader.readtext(
-                np.array(imagesDict[key]), detail=0
-            )  # this removes bounding box and confidence info
+                np.array(imagesDict[key]), detail=detail
+            )  # detail = 0 removes bounding box and confidence info
             if len(result) > 0:
-                extracted_data[key] = result[0]
+                if detail == 0:
+                    extracted_data[key] = result[0]
+                else:
+                    extracted_data[key] = result[0][1]
             else:
                 extracted_data[key] = ""
 
