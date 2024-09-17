@@ -232,7 +232,7 @@ def print_accuracy_metrics(
         )
 
 
-def create_accuracy_pyplot(
+def create_accuracy_pyplots(
     avg_accuracy,
     avg_edit_distance,
     avg_cer,
@@ -291,6 +291,27 @@ def create_accuracy_pyplot(
 
     table.auto_set_column_width(col=list(range(len(columns))))  # Adjust column widths
     plt.subplots_adjust(left=0.2, top=0.8)
+
+    plt.figure() #end the first figure so you can make a second one
+
+    #Make bar graph
+    categories = fields
+    accuracy_vals = [float(row[0]) for row in eval_params]
+    print(accuracy_vals)
+    values = accuracy_vals
+    plt.bar(categories, values)
+    plt.title('Accuracy of OCR for each physiological parameter')
+    plt.xlabel('Physiological Parameters')
+    plt.ylabel('Accuracy (%)')
+    # plt.grid(axis='y', linestyle='--', alpha=0.7)
+    for i, v in enumerate(values):
+        plt.text(i, v - 1, str(v), ha='center', va='bottom')
+    # for value in values:
+    #     plt.axhline(y=value, color='grey', linestyle='--', alpha=0.7)
+    # for i, value in enumerate(values):
+    #     plt.hlines(y=value, xmin=i - 0.4, xmax=i + 0.4, colors='black', linestyles='solid')
+
+    plt.ylim(0, 100)  # Adjust this range as needed
     plt.show()
 
 
@@ -303,6 +324,7 @@ def calculate_accuracy(extracted_data_path, expected_data_sheet):
 
     extracted_data = get_extracted_data(extracted_data_path, fields)
     expected_data = get_expected_data(expected_data_sheet, fields)
+
     if len(expected_data) != len(extracted_data):
         print(
             "ERROR: Length of expected data doesn't match length of extracted data. Ending program"
@@ -336,7 +358,7 @@ def calculate_accuracy(extracted_data_path, expected_data_sheet):
         image_count,
         fields,
     )
-    create_accuracy_pyplot(
+    create_accuracy_pyplots(
         avg_accuracy,
         avg_edit_distance,
         avg_cer,
@@ -345,7 +367,6 @@ def calculate_accuracy(extracted_data_path, expected_data_sheet):
         eval_params_minmax, #TODO make create_acc_pyplot and print_acc_metrics use minmax for the eval params
         fields,
     )
-
 
 if __name__ == "__main__":
     if len(sys.argv) == 3:
