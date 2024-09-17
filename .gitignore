@@ -10,3 +10,4 @@ pip_packages/*
 __pycache__/*
 *.pyc
 */~$monitor_data.xlsx
+images_from_rpi/*

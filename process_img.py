@@ -234,7 +234,7 @@ def get_field_cropped_imgs(image, monitor, bbox_adjustment):
                     bestBBox['co2.fi'] = (xmin, ymin, int((xmin + (xmax - xmin)/2)), ymax)
         
         #Fix for aa.et and aa.fi bounding boxes including text that is just to the left of the numbers and throwing off the OCR
-        if 'aa.et' in bestBBox.keys():
+        if 'aa.et' in bestBBox.keys(): #TODO make the dirty fixes for bboxes depend on monitor
             if bestBBox['aa.et'][2] - bestBBox['aa.et'][0] > 50:
                 bboxWidth = bestBBox['aa.et'][2] - bestBBox['aa.et'][0]
                 bestBBox['aa.et'] = [bestBBox['aa.et'][0] + bboxWidth/2, bestBBox['aa.et'][1], bestBBox['aa.et'][2], bestBBox['aa.et'][3]]

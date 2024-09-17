@@ -65,7 +65,7 @@ def make_in_range(field, num):
             ):  # if both are valid, choose the one which removes the first character TODO this is arbitrary
                 return postNum
         # Give up, you can't make this number fit the range
-        print("Failed to make into correct range: " + field + " " + num)
+        print("Failed to make into correct range: " + field + " " + num) #TODO this should return the null value if you can't fit in the correct range
         return num
 
 
@@ -80,7 +80,7 @@ def sanitycheck_data(extracted_data):
             char.isdigit() for char in extracted_data[key]
         ):  # If the string is horribly wrong, or is empty, or is ---
             extracted_data[key] = (
-                "---"  # easyOCR often reads --- as empty string. This fixes that problem TODO fix this to work with oldmonitor and new
+                "---"  # easyOCR often reads --- as empty string. This fixes that problem TODO fix this to work with oldmonitor and new. Make the none character depend on the monitor.
             )
             continue
 
