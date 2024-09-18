@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import os
 import openpyxl
 
-from monitor_values import Field_Ranges, HospitalMonitor, OldMonitor
+from monitor_values import CustomMonitor, Field_Ranges, HospitalMonitor, OldMonitor
 
 
 def get_extracted_data(extracted_data_path, fields):
@@ -315,11 +315,20 @@ def create_accuracy_pyplots(
     plt.show()
 
 
-def calculate_accuracy(extracted_data_path, expected_data_sheet):
-    monitor = HospitalMonitor()
+def calculate_accuracy(extracted_data_path, expected_data_sheet, monitor):
     print(expected_data_sheet)
-    if expected_data_sheet == "OldMonitor":
+
+    if monitor == "HospitalMonitor":
+        monitor = HospitalMonitor()
+    elif monitor == "OldMonitor":
         monitor = OldMonitor()
+    elif monitor == "CustomMonitor":
+        monitorfile = input("Please enter the path to the file to load a custom monitor from: ")
+        monitor = CustomMonitor(monitorfile)
+    else:
+        print("invalid monitor name entered")
+        return
+    
     fields = list(monitor.get_field_pos().keys())
 
     extracted_data = get_extracted_data(extracted_data_path, fields)
@@ -369,15 +378,16 @@ def calculate_accuracy(extracted_data_path, expected_data_sheet):
     )
 
 if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        calculate_accuracy(sys.argv[1], sys.argv[2])
+    if len(sys.argv) == 4:
+        calculate_accuracy(sys.argv[1], sys.argv[2], sys.argv[3])
     else:
         print(
-            "Need to enter 2 cmd arguments: First is the csv file of the OCR outputs, the second is what sheet in the excel file has the image data"
+            "Need to enter 3 cmd arguments: First is the csv file of the OCR outputs, the second is what sheet in the excel file has the image data, the third is the monitor type to use"
         )
         print(
             "Options for image data: OldMonitor, NormalHospital, RepositionedCameraHospital, DarkHospital, BrightReflectionHospital"
         )
+        print("Options for monitor: OldMonitor, HospitalMonitor, CustomMonitor")
 
 
 # TODO calculate the odds of getting an entire row correct, not just one field in a row

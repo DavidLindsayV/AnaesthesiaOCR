@@ -1,3 +1,6 @@
+import json
+
+
 class Monitor:
     def __init__(self, field_pos):
         pos_centres = {}
@@ -53,6 +56,13 @@ class HospitalMonitor(Monitor):
 
         super().__init__(self.field_pos)
 
+class CustomMonitor(Monitor):
+    def __init__(self, path):
+        with open(path, "r") as file:
+            loaded_dict = json.load(file)
+            self.field_pos = loaded_dict
+
+        super().__init__(self.field_pos)
 
 class Field_Ranges:
     field_ranges = {
@@ -68,3 +78,11 @@ class Field_Ranges:
         "spo2.SpO2": [100, 40],
         "spo2.pr": [160, 0],
     }
+
+#TODO
+# - make each monitor be loaded from a file
+# - make the main.py ask you which monitor you want to load and use
+# - make the MonitorMakingGUI.py write to a file
+# - make the other use cases of monitor
+# - make the checkaccuracy ask which monitor to use
+# - make the process_imgs fixes and the postprocessing info be stored in Monitor

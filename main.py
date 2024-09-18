@@ -1,7 +1,7 @@
 import os
 import random
 from check_accuracy import get_expected_data_row
-from monitor_values import HospitalMonitor, OldMonitor
+from monitor_values import CustomMonitor, HospitalMonitor, OldMonitor
 from process_img import process_img
 from query import extract_data
 from write_to_csv import write_to_csv
@@ -47,10 +47,18 @@ def get_sheet_name_from_folder_path(imgPath):
     elif "repositionedcamerahospital_images" in imgPath:
         return "RepositionedCameraHospital"
 
-def test_with_img(imgPath): 
-    monitor = HospitalMonitor()
-    if "oldmonitor_images" in imgPath:
+def test_with_img(imgPath, monitor): 
+    if monitor == "HospitalMonitor":
+        monitor = HospitalMonitor()
+    elif monitor == "OldMonitor":
         monitor = OldMonitor()
+    elif monitor == "CustomMonitor":
+        monitorfile = input("Please enter the path to the file to load a custom monitor from: ")
+        monitor = CustomMonitor(monitorfile)
+    else:
+        print("invalid monitor name entered")
+        return
+    
     bbox_adjustment = True
 
     #Get extracted data
@@ -71,12 +79,19 @@ def test_with_random_image(imgFolder):
     imgNum = random.randint(1, num_images)
     test_with_img(os.path.join(path, imgNum + "tmp.jpg"))
 
-def write_to_csv_all_images(img_folder):
+def write_to_csv_all_images(img_folder, monitor):
     dir = os.path.join("images", img_folder)
 
-    monitor = HospitalMonitor()
-    if img_folder == "oldmonitor_images":
+    if monitor == "HospitalMonitor":
+        monitor = HospitalMonitor()
+    elif monitor == "OldMonitor":
         monitor = OldMonitor()
+    elif monitor == "CustomMonitor":
+        monitorfile = input("Please enter the path to the file to load a custom monitor from: ")
+        monitor = CustomMonitor(monitorfile)
+    else:
+        print("invalid monitor name entered")
+        return
 
     bbox_adjustment = True
 
@@ -111,7 +126,8 @@ if __name__ == "__main__":
     # else:
     #     print("Need to know what folder of images to choose randomly from. Choose one of the subfolder names within images folder")
 
-    if len(sys.argv) >= 2:
-        write_to_csv_all_images(sys.argv[1])
+    if len(sys.argv) == 3:
+        write_to_csv_all_images(sys.argv[1], sys.argv[2])
     else:
-        print("Need to know what images to make into csv. Provide one command line argument, one of the names of the image subfolders within the image folder")
+        print("Please provide 2 cmd arguments. First, one of the names of the image subfolders within the image folder. Secondly, which monitor to use")
+        print("The monitor options are: OldMonitor, HospitalMonitor, CustomMonitor")

@@ -73,7 +73,7 @@ def write_to_csv(ocr_data):
         data_EddiFormat.append(dataDict)
 
     # File path to save the CSV file
-    csv_file_path_text = "output_text.csv"
+    csv_file_path_text = "output_accuracyChecking.csv"
     csv_file_path_EDDI = "output_eddi.csv"
 
     # Writing data to CSV file

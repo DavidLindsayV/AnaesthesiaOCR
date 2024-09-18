@@ -1,3 +1,4 @@
+import json
 import sys
 import tkinter as tk
 from tkinter import Button, Canvas
@@ -36,7 +37,8 @@ class ImageClickApp:
         # Add a button to clear the canvas
         self.field_buttons = []
         num_columns = 10
-        field_names = ["rtime",	"ecg.hr",	"ecg.st1",	"ecg.st2",	"ecg.st3",	"ecg.imp_rr",	"p1.sys",	"p1.dia",	"p1.mean",	"p1.hr",	"p2.sys",	"p2.dia",	"p2.mean",	"p2.hr",	"p3.sys",	"p3.dia",	"p3.mean", 	"p3.hr",	"p4.sys",	"p4.dia",	"p4.mean",	"p4.hr",	"nibp.sys",	"nibp.dia",	"nibp.mean",	"nibp.hr",	"t1.temp",	"t2.temp",	"t3.temp",	"t4.temp",	"spo2.SpO2"	,"spo2.pr",	"spo2.ir_amp",	"co2.et",	"co2.fi",	"co2.rr",	"co2.amb_press",	"o2.et",	"o2.fi",	"n2o.et",	"n2o.fi",	"aa.et",	"aa.fi",	"aa.mac_sum",	"p5.sys",	"p5.dia",	"p5.mean",	"p5.hr",	"p6.sys",	"p6.dia",	"p6.mean",	"p6.hr"]
+        field_names = ["ecg.hr", "co2.et", "co2.fi", "co2.rr", "p1.sys", "p1.dia", "p1.mean", "aa.et", "aa.fi", "spo2.SpO2", "spo2.pr"]
+        # field_names = ["ecg.hr","p1.sys",	"p1.dia",	"p1.mean",	"p1.hr",	"nibp.sys",	"nibp.dia",	"nibp.mean",	"nibp.hr",	"t1.temp",	"t2.temp",	"t3.temp",	"t4.temp",	"spo2.SpO2"	,"spo2.pr",	"spo2.ir_amp",	"co2.et",	"co2.fi",	"co2.rr",	"co2.amb_press",	"o2.et",	"o2.fi",	"n2o.et",	"n2o.fi",	"aa.et",	"aa.fi",	"aa.mac_sum",	"p5.sys",	"p5.dia",	"p5.mean",	"p5.hr",	"p6.sys",	"p6.dia",	"p6.mean",	"p6.hr"]
         for i, field_name in enumerate(field_names):
             button = Button(self.button_frame, text=field_name, command=lambda field_name=field_name: self.set_field(field_name=field_name))
             # button.pack(side=tk.LEFT, padx=0, pady=0)
@@ -68,8 +70,9 @@ class ImageClickApp:
         self.field_name = field_name
 
     def write_monitor_values(self):
-        print('i run')
-        print(self.monitor_values)
+        with open("MonitorValues.json", "w") as file:
+            json.dump(self.monitor_values, file)
+            print("The monitor values have been written to MonitorValues.json. You can now close the GUI")
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:
