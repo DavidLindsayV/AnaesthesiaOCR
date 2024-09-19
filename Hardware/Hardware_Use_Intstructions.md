@@ -12,36 +12,32 @@
 The pi should boot up (you can tell because the red light turns on)
 - If you can't see anything on your screen, turn the rpi off and on again, after having ensured that all other steps were done correctly.
 Doing something like connecting the monitor after having turned the pi on first will sometimes lead to the monitor not displaying correctly.
-
-If the .bashrc has been set up to automatically run the image capture code, after finishing booting (a lot of text will scroll by on the monitor) the pi will display this text repeatedly:
-
-```text
-Image number X captured
-Time taken for image capture: Y
-Time between beginning of each image capture: 10.0
-```
-
-This is the program main.py running and taking images
+- Once the pi has finished booting up, enter 'startx'
+- Open a new terminal in the pi. It should put you in the directory containing the code files app.py and main.py
+- Run 'python3 main.py IP_ADDRESS PASSWORD' where IP_ADDRESS is the ip address you want to send the image files to, and PASSWORD is the password for that ip address
+(note: If you are not David using David's PC, you will need to modify app.py, as currently it is set to send files to the C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi folder on the remote host 'david')
+- The program should automatically take images every 10 seconds and send them to the C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi folder
+It will also save the captured images in folders named "images" with a timestamp
 
 ## To look at the code within the raspberry pi and access the GUI
 
-- (if the .bashrc has been setup) enter ctrl-c to stop the program from running
 - enter startx, and press enter to start the GUI
-- navigate to the code using the file explorer (eg home/engr302t12/Documents/optical-character-recognition/Project_Code). main.py is the python file that was running on startup. The folders named "images" with a timestamp will store all images that were taken while main.py was running.
-- When creating a new terminal, if .bashrc is setup to automatically run main.py, you will need to press ctrl-c each time you enter a terminal to stop main.py from running.
-It is also recommend that you stop all currently running python programs from running, in terminal enter pkill -f python
+- navigate to the code using the file explorer (eg home/engr302t12/Documents/optical-character-recognition/Project_Code).
+- It is also recommend that you stop all currently running python programs from running, in terminal enter pkill -f python
 - To run any python program, you cannot use geany to run python (it has errors recognizing which packages are present).
-You need to make a new terminal and run python main.py
+You need to make a new terminal and run python3 main.py
 - Remember to take the cap off the camera so that images can be seen
 
 ## To adjust camera focus
 
 - On the camera, twist the lens clockwise or counterclockwise to adjust the focus. Twisting counterclockwise brings the focus closer, twisting clockwise pushes the focus further out.
 
-## To add files onto the raspberry pi
+## To add files onto/off of the raspberry pi
 
-You can use the internet to transfer files, but this is extremely slow.
-It is recommended to use a USB stick to transfer files.
+It is recommended to use a USB stick to transfer files, or use scp if you have the networking working.
+Generic scp command:
+scp source destination
+where 'source' or 'destination' can be addresses on the local machine (eg ./path/to/myfolder/examplefiletomove.txt) or on the remote machine (eg engr302t12@ip_address:/path/to/myfolder/examplefiletomove.txt)
 
 ## Installing python versions/packages
 

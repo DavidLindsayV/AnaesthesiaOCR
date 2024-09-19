@@ -5,6 +5,7 @@ from cv2 import cv2 as cv
 import queue
 import os
 import threading
+import subprocess
 
 class VidCapture:
 	def __init__(self, name):
@@ -49,7 +50,7 @@ class App:
     """
 
 
-    def __init__(self, max_cycles=-1, delay=10, image = "test4.png"):
+    def __init__(self, IP, password, max_cycles=-1, delay=10):
         """Initialize the App and relevant class fields.
 
         Args:
@@ -61,7 +62,20 @@ class App:
         self.max_cycles = max_cycles
         self.cycles = 0
         self.delay = delay
-        self.image = image
+        self.IP = IP;
+        self.password = password
+	
+    def send_image(self, imagename):
+            remote_user = "david"
+            remote_host = self.IP
+            remote_folder = "C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi"
+            command = f"sshpass -p {self.password} scp ./{imagename} {remote_user}@{remote_host}:{remote_folder}" 
+            try:
+                result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+            except subprocess.CalledProcess as e:
+                print("error sending images over ssh")
+                print(e.stderr.decode())
+
 
     def run(self):
         """Run and process for max_cycles then close.
@@ -83,16 +97,20 @@ class App:
         while self.max_cycles == -1 or self.cycles < self.max_cycles:
             count += 1
             image = cap.read()
-            cv.imwrite('images-' + str(self.start_time) + '/'+str(count)+'tmp.jpg', image)
+            imagename = 'images-' + str(self.start_time) + '/'+str(count)+'tmp.jpg'
+            cv.imwrite(imagename, image)
+	    
+	    #Send image to PC via ssh
+            self.send_image(imagename)
             end_image_capture_time = time.perf_counter()
-            
+	    
             # Sleep rest of cycle
             current_time = time.perf_counter()
             wait_time = self.delay - (current_time - self.start_time) % self.delay
             time.sleep(wait_time)
             # Debug info
             print("Image number " + str(count) + " captured")
-            print(f"""Time taken for image capture: {(end_image_capture_time - begin_image_capture_time):.2f}""")
+            print(f"""Time taken for image capture and sending over ssh: {(end_image_capture_time - begin_image_capture_time):.2f}""")
             print(f"""Time  between beginning of each image capture: {(time.perf_counter() - begin_image_capture_time):.1f}\n\n""")
             begin_image_capture_time = time.perf_counter()
 	    

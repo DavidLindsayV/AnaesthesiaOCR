@@ -7,16 +7,17 @@ def main():
     """Creates and runs the app."""
     app = None
     try:
-        if len(sys.argv) == 4:
-            app = App(int(sys.argv[1]), int(sys.argv[2]),sys.argv[3])
+        if len(sys.argv) == 3:
+            app = App(sys.argv[1], sys.argv[2])
         else:
-            app = App()
+            print("You need to provide two cmd arguments - the IPv4 address and the password used on the ssh connection")
+            return
         app.run()
     except (RuntimeError, KeyboardInterrupt):
         pass
-    finally:
-        # Close the app upon any termination
-        atexit.register(app.close)
+#    finally:
+#        # Close the app upon any termination
+#        atexit.register(app.close)
 
 if __name__ == "__main__":
     main()
