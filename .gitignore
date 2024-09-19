@@ -12,3 +12,4 @@ __pycache__/*
 */~$monitor_data.xlsx
 images_from_rpi/*
 Hardware/Getting_Imgs_Off_Rpi.txt
+EDDI_files/DatexOhmeda.Interpreter/DatexOhmeda.Interpreter/obj/Debug/*
