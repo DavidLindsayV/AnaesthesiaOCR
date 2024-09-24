@@ -14,9 +14,42 @@ The pi should boot up (you can tell because the red light turns on)
 Doing something like connecting the monitor after having turned the pi on first will sometimes lead to the monitor not displaying correctly.
 - Once the pi has finished booting up, enter 'startx'
 - Open a new terminal in the pi. It should put you in the directory containing the code files app.py and main.py
-- Run 'python3 main.py IP_ADDRESS PASSWORD' where IP_ADDRESS is the ip address you want to send the image files to, and PASSWORD is the password for that ip address
+- Follow the steps in 'Enabling networking and running main.py' to run the code that will capture images and send them from the pi to your pc
+
+## Enabling networking and running main.py
+
+- Connect the pi and your laptop
+Plug a USB-to-ethernet dongle into your laptop, and plug a crossover ethernet cable into that dongle, and plug the other end of that crossover ethernet cable into the pi.
+
+ONE-TIME NETWORKING SETUP STEPS
+
+- On your windows pc, get your ssh server up and running
+  - install openssh server
+  - in administator powershell, run
+  Start-Service sshd
+  Set-Service -Name sshd -StartupType 'Automatic'
+  - to check its running
+  Get-Service -Name sshd
+- On your windows pc, ensure that you have allowed ssh through your windows firewall (an inbound rule should allow traffic on port 22). Use 'netsh winsock reset' to reset your networking afterwards so your updated firewall rules are used.
+- on the pi, enable ssh by typing 'sudo raspi-config' in a terminal and enabling ssh in the interface options
+- On the pi, set up it's ethernet address and routing.
+Right click on its wifi symbol in the top right, click Network Settings, and in the Network Preferences box that appears set eth0 ipv4 address to 192.168.1.11
+Check this has worked by running 'ifconfig' in a terminal. It should show you the ethernet ip address, among other information.
+
+NOT ONE-TIME STEPS
+
+- In the pi's cmd, run the command 'sudo ip route add 192.168.1.0/24 via 192.168.1.11' to add ethernet to its routing table
+Run 'ip route' and check that the route exists for ethernet (a row in the table that is printed out should have 'eth0')
+- On your windows pc, open Network Connections in settings -> click Properties -> Double click Internet Protocol Version 4
+Set the IP address to 192.168.1.10 and the netmask to 255.255.255.0
+Check your ethernet ip has been set correctly by running 'ipconfig' in a terminal and checking the ethernet address is what you set it to
+- Check you can now use ethernet to connect from the pi to the pc.
+Use 'ssh david@192.168.1.10' on the pi
+If it works, you have succeeded in setting up ethernet connection!
+(this step is important to do as it allows you to add this connection to the list of known hosts)
+- Run 'python3 main.py 192.168.1.10 PASSWORD' where 192.168.1.10 is the ip address you want to send the image files to, and PASSWORD is the password for that ip address
 (note: If you are not David using David's PC, you will need to modify app.py, as currently it is set to send files to the C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi folder on the remote host 'david')
-- The program should automatically take images every 10 seconds and send them to the C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi folder
+- The program on the pi should automatically take images every 10 seconds and send them to the C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi folder
 It will also save the captured images in folders named "images" with a timestamp
 
 ## To look at the code within the raspberry pi and access the GUI
@@ -39,13 +72,6 @@ Generic scp command:
 scp source destination
 where 'source' or 'destination' can be addresses on the local machine (eg ./path/to/myfolder/examplefiletomove.txt) or on the remote machine (eg engr302t12@ip_address:/path/to/myfolder/examplefiletomove.txt)
 
-## Installing python versions/packages
-
-To install python packages, use Pip. Please note it is slow due to its reliance on the rpi's internet connection.
-
-To install a different python version, follow the instructions present in https://hub.tcno.co/pi/software/python-update/.
-I recommend when running sudo make to use one core instead of 4 to avoid crashes.
-
 ## Test whether the system is 32 bit or 64 bit
 
 - Open a terminal
@@ -66,13 +92,14 @@ install virtualenv using 'python3 -m pip install virtualenv --break-system-packa
 Create a new virtualenv with 'python3 -m venv your_venv_name'
 Activate the virtual environment with 'source your_venv_name/bin/activate'
 - Install the needed packages using pip (it is recommended you use a terminal and run 'python main.py' and address any errors to make sure all needed packages are installed)
-- If you wish to have main.py run automatically on startup, within the home directory (whichever directory the file explorer shows has an icon of a red home on it - or whichever directory you navigate to with 'cd ~') modify the .bashrc file (use 'nano .bashrc' to modify .bashrc) to have the instructions at the bottom (before the virtual enviromnent's environment variables are exported, but after everything else)
 
-```bash
-source ~/path/to/virtualenvironment/bin/activate
-cd ~/path/to/folder_containing_main.py
-python main.py
-```
+## To clear images_from_rpi folder
+
+Over the course of receiving images from the rpi, images will inevitably fill up the images_from_rpi folder on your laptop.
+You will often want to empty this folder, because you don't want to use old images from previous sessions.
+To do this (easily) use this command in command prompt when you've navigated into images_from_rpi:
+del /q *
+This will delete all files in images_from_rpi
 
 ### Problems with the hardware that will need to be avoided/worked around
 
