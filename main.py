@@ -4,21 +4,9 @@ from check_accuracy import get_expected_data_row
 from monitor_values import CustomMonitor, HospitalMonitor, OldMonitor
 from process_img import process_img
 from query import extract_data
-from write_to_csv import write_to_csv
+from write_to_csv import is_number, parse_number, write_to_csv
 from datetime import datetime
 import sys
-
-
-def checkAnswers(extracted_data):
-    ###Tests the answers to see if the numbers extracted match image.png
-    print()
-    expected_data = {'ecg.hr': '76', 'co2.et': '37', 'co2.fi': '0', 'co2.rr': '16', 'p1.sys': '139', 'p1.dia': '79', 'p1.mean': '(94)', 'aa.et': '0.80', 'aa.fi': '2.1'}
-    print(expected_data)
-    print(extracted_data)
-
-    for key in expected_data.keys():
-        if expected_data[key] != extracted_data[key]:
-            print("WRONG " + key + " Expected: " + expected_data[key] + " Actual: " + extracted_data[key])
 
 def checkAnswersForImg(imgNum, ocrAnswers, expected_data):
     print("Image = " + str(imgNum) + "tmp.jpg")
@@ -27,13 +15,6 @@ def checkAnswersForImg(imgNum, ocrAnswers, expected_data):
     for key in ocrAnswers.keys():
         if expected_data[key] != ocrAnswers[key]:
             print("WRONG " + key + " Expected: " + expected_data[key] + " Actual: " + ocrAnswers[key])
-
-def test_with_one_image():
-    imagesDict = process_img(os.path.join("misc_images", "image.png"))
-    time = datetime.now()
-    extracted_data = [extract_data(imagesDict)]
-    print("Time taken to perform AI OCR = " + str(datetime.now() - time))
-    checkAnswers(extracted_data[0])
 
 def get_sheet_name_from_folder_path(imgPath):
     if "brightreflectionhospital" in imgPath:
@@ -114,6 +95,27 @@ def write_to_csv_all_images(img_folder, monitor):
     write_to_csv(ocr_data)
     print("Completed! Time taken = " + str(datetime.now() - starttime))
     print("Longest time to process an image: " + str(maxImageTime))
+
+def get_latest_received_img_data(monitor):  #Make EDDI work with the user entering/selecting the monitor to use
+    bbox_adjustment = True
+    starttime = datetime.now()
+    os.chdir('C:\\Users\\david\\Documents\\University_courses\\University_2024_Tri1\\ENGR489\\engr489-anaesthesiaocr')
+    num_images = len(os.listdir("images_from_rpi"))
+    imageName = str(num_images) + "tmp.jpg"
+    print("Processing image " + imageName)
+    filename = os.path.join("images_from_rpi", imageName)
+    imagesDict = process_img(filename, monitor, bbox_adjustment)
+    data = extract_data(imagesDict)
+    for field in data.keys():
+        if is_number(data[field]):
+            number = parse_number(data[field])
+            data[field] = number
+        else:
+            del data[field]
+    data['rtime'] = starttime
+    print(imageName + "OCR Completed! Time taken = " + str(datetime.now() - starttime))
+    return data
+
 
 if __name__ == "__main__":
     # if len(sys.argv) > 1:

@@ -1,6 +1,5 @@
 import json
 
-
 class Monitor:
     def __init__(self, field_pos):
         pos_centres = {}
