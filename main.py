@@ -96,7 +96,7 @@ def write_to_csv_all_images(img_folder, monitor):
     print("Completed! Time taken = " + str(datetime.now() - starttime))
     print("Longest time to process an image: " + str(maxImageTime))
 
-def get_latest_received_img_data(monitor):  #Make EDDI work with the user entering/selecting the monitor to use
+def get_latest_received_img_data(monitor):  
     bbox_adjustment = True
     starttime = datetime.now()
     os.chdir('C:\\Users\\david\\Documents\\University_courses\\University_2024_Tri1\\ENGR489\\engr489-anaesthesiaocr')
@@ -106,16 +106,19 @@ def get_latest_received_img_data(monitor):  #Make EDDI work with the user enteri
     filename = os.path.join("images_from_rpi", imageName)
     imagesDict = process_img(filename, monitor, bbox_adjustment)
     data = extract_data(imagesDict)
+    toDelete = []
     for field in data.keys():
         if is_number(data[field]):
             number = parse_number(data[field])
             data[field] = number
         else:
-            del data[field]
+            toDelete.append(field)
+    #Delete all fields that cannot be parsed into numbers
+    for field in toDelete:
+        del data[field]
     data['rtime'] = starttime
     print(imageName + "OCR Completed! Time taken = " + str(datetime.now() - starttime))
     return data
-
 
 if __name__ == "__main__":
     # if len(sys.argv) > 1:
