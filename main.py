@@ -116,7 +116,7 @@ def get_latest_received_img_data(monitor):
     #Delete all fields that cannot be parsed into numbers
     for field in toDelete:
         del data[field]
-    data['rtime'] = starttime
+    data['rtime'] = starttime.strftime("%d/%m/%Y %H:%M:%S")
     print(imageName + "OCR Completed! Time taken = " + str(datetime.now() - starttime))
     return data
 
