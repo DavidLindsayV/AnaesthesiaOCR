@@ -123,7 +123,7 @@ def calculate_accuracy_metrics(extracted_data, expected_data, fields):
     num_correct = 0
     tot_edit_dist = 0
     tot_cer = 0
-    tot_numerical_dist = 0
+    tot_num_dist_norm = 0
     eval_params = [
         [0 for y in range(5)] for x in range(len(fields))
     ]  # this is a 2d array. The first index is what the field is. The second array is of [count_of_correct_ocr, total_edit_distance, total_cer, tot_numeric_dist, tot_numeric_dist_normalised]
@@ -157,10 +157,10 @@ def calculate_accuracy_metrics(extracted_data, expected_data, fields):
             if is_float(extr) and is_float(exp):
                 exp = re.sub(r"[^0-9.]", "", exp)
                 extr = re.sub(r"[^0-9.]", "", extr)
-                tot_numerical_dist += abs(float(exp) - float(extr))
                 num_dist = abs(float(exp) - float(extr))
                 field_range = field_ranges[fields[j]][0] - field_ranges[fields[j]][1]
                 num_dist_norm = abs(float(exp) - float(extr)) / field_range
+                tot_num_dist_norm = tot_num_dist_norm + num_dist_norm
             
             eval_params, eval_params_minmax = update_eval_params(eval_params, eval_params_minmax, j, is_correct, edit_dist, CER, num_dist, num_dist_norm)
 
@@ -170,14 +170,14 @@ def calculate_accuracy_metrics(extracted_data, expected_data, fields):
     avg_accuracy = "{:.1f}".format((num_correct / tot_param_count) * 100)
     avg_edit_distance = "{:.3f}".format((tot_edit_dist / tot_param_count))
     avg_cer = "{:.3f}".format((tot_cer / tot_param_count) * 100)
-    avg_numerical_distance = "{:.3f}".format((tot_numerical_dist / tot_param_count))
+    avg_numerical_norm_distance = "{:.3f}".format((tot_num_dist_norm / tot_param_count))
     image_count = len(extracted_data)
 
     return (
         avg_accuracy,
         avg_edit_distance,
         avg_cer,
-        avg_numerical_distance,
+        avg_numerical_norm_distance,
         image_count,
         eval_params,
         eval_params_minmax
@@ -188,7 +188,7 @@ def print_accuracy_metrics(
     avg_accuracy,
     avg_edit_distance,
     avg_cer,
-    avg_numerical_distance,
+    avg_numerical_norm_distance,
     eval_params,
     eval_params_minmax,
     image_count,
@@ -198,7 +198,7 @@ def print_accuracy_metrics(
     print("ACCURACY: " + avg_accuracy + "%")
     print("AVG EDIT DISTANCE: " + avg_edit_distance + " edits")
     print("AVG CHARACTER ERROR RATE: " + avg_cer + "%")
-    print("AVG NUMERICAL DISTANCE: " + avg_numerical_distance)
+    print("AVG NORMALISED NUMERICAL DISTANCE: " + avg_numerical_norm_distance)
     print()
     for i in range(len(fields)):
 
@@ -236,7 +236,7 @@ def create_accuracy_pyplots(
     avg_accuracy,
     avg_edit_distance,
     avg_cer,
-    avg_numerical_distance,
+    avg_numerical_norm_distance,
     eval_params,
     eval_params_minmax,
     fields,
@@ -262,7 +262,7 @@ def create_accuracy_pyplots(
     fields.append("Average")
     rows = fields
     eval_params.append(
-        [avg_accuracy, avg_edit_distance, avg_cer, avg_numerical_distance, "NA"]
+        [avg_accuracy, avg_edit_distance, avg_cer, "NA", avg_numerical_norm_distance]
     )
     table_data = eval_params
     table = ax.table(
@@ -351,7 +351,7 @@ def calculate_accuracy(extracted_data_path, expected_data_sheet, monitor):
         avg_accuracy,
         avg_edit_distance,
         avg_cer,
-        avg_numerical_distance,
+        avg_numerical_norm_distance,
         image_count,
         eval_params,
         eval_params_minmax
@@ -361,7 +361,7 @@ def calculate_accuracy(extracted_data_path, expected_data_sheet, monitor):
         avg_accuracy,
         avg_edit_distance,
         avg_cer,
-        avg_numerical_distance,
+        avg_numerical_norm_distance,
         eval_params,
         eval_params_minmax,
         image_count,
@@ -371,9 +371,9 @@ def calculate_accuracy(extracted_data_path, expected_data_sheet, monitor):
         avg_accuracy,
         avg_edit_distance,
         avg_cer,
-        avg_numerical_distance,
+        avg_numerical_norm_distance,
         eval_params,
-        eval_params_minmax, #TODO make create_acc_pyplot and print_acc_metrics use minmax for the eval params
+        eval_params_minmax, 
         fields,
     )
 
@@ -382,7 +382,7 @@ if __name__ == "__main__":
         calculate_accuracy(sys.argv[1], sys.argv[2], sys.argv[3])
     else:
         print(
-            "Need to enter 3 cmd arguments: First is the csv file of the OCR outputs, the second is what sheet in the excel file has the image data, the third is the monitor type to use"
+            "Need to enter 3 cmd arguments: First is the csv file of the OCR outputs, the second is what sheet in the excel file has the image data to compare the OCR outputs to, the third is the monitor type to use"
         )
         print(
             "Options for image data: OldMonitor, NormalHospital, RepositionedCameraHospital, DarkHospital, BrightReflectionHospital"
