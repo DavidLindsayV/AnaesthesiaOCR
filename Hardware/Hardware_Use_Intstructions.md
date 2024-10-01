@@ -47,6 +47,7 @@ Check your ethernet ip has been set correctly by running 'ipconfig' in a termina
 Use 'ssh david@192.168.1.10' on the pi
 If it works, you have succeeded in setting up ethernet connection!
 (this step is important to do as it allows you to add this connection to the list of known hosts)
+If this step doesn't work, try disconnecting and reconnecting all the cables again. Multiple times.
 - Run 'python3 main.py 192.168.1.10 PASSWORD' where 192.168.1.10 is the ip address you want to send the image files to, and PASSWORD is the password for that ip address
 (note: If you are not David using David's PC, you will need to modify app.py, as currently it is set to send files to the C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi folder on the remote host 'david')
 - The program on the pi should automatically take images every 10 seconds and send them to the C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi folder
