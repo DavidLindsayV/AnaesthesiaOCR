@@ -78,10 +78,3 @@ class Field_Ranges:
         "spo2.pr": [160, 0],
     }
 
-#TODO
-# - make each monitor be loaded from a file
-# - make the main.py ask you which monitor you want to load and use
-# - make the MonitorMakingGUI.py write to a file
-# - make the other use cases of monitor
-# - make the checkaccuracy ask which monitor to use
-# - make the process_imgs fixes and the postprocessing info be stored in Monitor
