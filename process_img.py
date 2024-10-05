@@ -223,7 +223,7 @@ def get_field_cropped_imgs(image, monitor, bbox_adjustment):
                 print("No bbox found for " + field)
                 bestBBox[field] = fieldpos[field]
             
-        #manual fix for co2.rr being misread because it includes co2.fi. This fix is only used for the oldMonitor as HospitalMonitor does not have co2.fi
+        #fix for co2.rr being misread because it includes co2.fi. This fix is only used for the oldMonitor as HospitalMonitor does not have co2.fi
         if 'co2.fi' in bestBBox.keys() and 'co2.rr' in bestBBox.keys():
             if bestBBox['co2.rr'][0] < center_coords['co2.fi'][0] < bestBBox['co2.rr'][2] and bestBBox['co2.rr'][1] < center_coords['co2.fi'][1] < bestBBox['co2.rr'][3]:
                     xmin = bestBBox['co2.rr'][0]
