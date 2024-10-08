@@ -60,6 +60,8 @@ test_bboxes.py: a python file used for creating images that show bounding boxes 
 
 test_keystone.py: some code that was used to test using keystone correction to address image warping due to camera perspective. 
 
+make_rpi_speed_plot.py: makes a pyplot showing the speed of image capture and sending from the rpi. Uses hardcoded values measured from a previous run of using the rpi. The values are not dynamically generated.
+
 write_to_csv.py: a file containing code to write OCR-extracted data into csv. It generates 2 csv files, one used for accuracy checking (that contains results accurate to what text is displayed on the monitor screen) and another that EDDI can use as input
 
 query.py: A file that contains the code for querying OCR AI models (such as EasyOCR), as well as the code for postprocessing their outputs (sanitycheck_data performs postprocessing on OCR output)
