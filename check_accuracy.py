@@ -198,7 +198,7 @@ def print_accuracy_metrics(
     print("ACCURACY: " + avg_accuracy + "%")
     print("AVG EDIT DISTANCE: " + avg_edit_distance + " edits")
     print("AVG CHARACTER ERROR RATE: " + avg_cer + "%")
-    print("AVG NORMALISED NUMERICAL DISTANCE: " + avg_numerical_norm_distance)
+    print("AVG NORMALISED NUMERICAL ERROR: " + avg_numerical_norm_distance)
     print()
     for i in range(len(fields)):
 
@@ -224,9 +224,9 @@ def print_accuracy_metrics(
             + eval_params[i][1]
             + " edits (min " + eval_params_minmax[i][1][0] + ", max " + eval_params_minmax[i][1][1] + ") | Avg CER: "
             + eval_params[i][2]
-            + "% (min " + eval_params_minmax[i][2][0] + ", max " + eval_params_minmax[i][2][1] + ") | Avg Numeric Distance = "
+            + "% (min " + eval_params_minmax[i][2][0] + ", max " + eval_params_minmax[i][2][1] + ") | Avg Numeric Error = "
             + eval_params[i][3]
-            + " (min " + eval_params_minmax[i][3][0] + ", max " + eval_params_minmax[i][3][1] + ") | Normalised Avg Numeric Distance = "
+            + " (min " + eval_params_minmax[i][3][0] + ", max " + eval_params_minmax[i][3][1] + ") | Normalised Avg Numeric Error = "
             + eval_params[i][4]
             + "% (min " + eval_params_minmax[i][4][0] + ", max " + eval_params_minmax[i][4][1] + ")"
         )
@@ -256,8 +256,8 @@ def create_accuracy_pyplots(
         "Accuracy (%)",
         "Avg Edit Distance (edits)",
         "Avg Character Error Rate (%)",
-        "Avg Numeric Distance (unitless)",
-        "Norm Avg Numeric Distance (%)",
+        "Avg Numeric Error (unitless)",
+        "Norm Avg Numeric Error (%)",
     ]
     fields.append("Average")
     rows = fields
