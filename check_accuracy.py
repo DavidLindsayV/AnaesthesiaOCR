@@ -254,10 +254,10 @@ def create_accuracy_pyplots(
     ax.set_frame_on(False)
     columns = [
         "Accuracy (%)",
-        "Avg Edit Distance (edits)",
-        "Avg Character Error Rate (%)",
-        "Avg Numeric Error (unitless)",
-        "Norm Avg Numeric Error (%)",
+        "Avg Edit\nDistance (edits)",
+        "Avg Character\nError Rate (%)",
+        "Avg Numeric\nError (unitless)",
+        "Norm Avg \nNumeric Error (%)",
     ]
     fields.append("Average")
     rows = fields
@@ -277,17 +277,19 @@ def create_accuracy_pyplots(
     table.scale(1, 1)  # Scale the table cells (width, height)
     for key, cell in table.get_celld().items():
         if key[0] == 0 or key[1] == -1:
+            if key[0] == 0:
+                cell.set_height(0.1)
             cell.set_text_props(weight="bold")
             # cell.set_text_props(fontsize='10')
             cell.set_facecolor("#D3D3D3")  # Light gray background for header
         else:
             cell.set_edgecolor("black")  # Black border for cells
-            cell.set_linewidth(0.5)  # Border line width
+            cell.set_linewidth(1)  # Border line width
     final_row_idx = len(rows)
     for col_idx in range(len(columns)):
         cell = table[(final_row_idx, col_idx)]
         cell.set_text_props(weight="bold")
-        cell.set_linewidth(1)
+        cell.set_linewidth(2)
 
     table.auto_set_column_width(col=list(range(len(columns))))  # Adjust column widths
     plt.subplots_adjust(left=0.2, top=0.8)
