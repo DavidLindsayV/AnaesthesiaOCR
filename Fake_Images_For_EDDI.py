@@ -4,6 +4,10 @@ import os
 import time
 
 def fake_image_capture_for_EDDI():
+    """Continually copies images from one of the image datasets into images_from_rpi, to simulate new images being captured and sent from the raspberry pi
+    It's used to simulate new images being captured without needing access to a medical simulator
+    """
+    
     count = 1
     while(True):
         starttime = datetime.now()

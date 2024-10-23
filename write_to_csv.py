@@ -4,12 +4,28 @@ import re
 
 
 def is_number(string):
+    """Checks if a string is a number (decimal, whole, or surrounded by brackets)
+
+    Args:
+        string: string to check if its a number
+
+    Returns:
+        bool: whether the string is a number
+    """
     # Regular expression to match a number, optionally surrounded by brackets
     pattern = r"\(?\d+(\.\d+)?\)?"
     return bool(re.match(pattern, string))
 
 
 def parse_number(string):
+    """Parses a number from a string, even when it contains brackets
+
+    Args:
+        string (string): string to parse
+
+    Returns:
+        float or int : float or int parsed from string
+    """
     string = string.replace("(", "").replace(")", "")
     if "." in string:
         string = float(string)
@@ -19,6 +35,11 @@ def parse_number(string):
 
 
 def write_to_csv(ocr_data):
+    """Writes the ocr data to csv files. One csv file ends in _eddi and is used as EDDI input, and the other ends in _accuracyChecking, and is used for accuracy evaluation
+
+    Args:
+        ocr_data: The data extracted via OCR
+    """
     field_names = ["rtime",	"ecg.hr",	"ecg.st1",	"ecg.st2",	"ecg.st3",	"ecg.imp_rr",	"p1.sys",	"p1.dia",	"p1.mean",	"p1.hr",	"p2.sys",	"p2.dia",	"p2.mean",	"p2.hr",	"p3.sys",	"p3.dia",	"p3.mean", 	"p3.hr",	"p4.sys",	"p4.dia",	"p4.mean",	"p4.hr",	"nibp.sys",	"nibp.dia",	"nibp.mean",	"nibp.hr",	"t1.temp",	"t2.temp",	"t3.temp",	"t4.temp",	"spo2.SpO2"	,"spo2.pr",	"spo2.ir_amp",	"co2.et",	"co2.fi",	"co2.rr",	"co2.amb_press",	"o2.et",	"o2.fi",	"n2o.et",	"n2o.fi",	"aa.et",	"aa.fi",	"aa.mac_sum",	"p5.sys",	"p5.dia",	"p5.mean",	"p5.hr",	"p6.sys",	"p6.dia",	"p6.mean",	"p6.hr"]
     fields_to_multiply_by_100 = [
         "p1.mean",

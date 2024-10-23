@@ -2,6 +2,8 @@ from matplotlib import pyplot as plt
 
 
 def make_graph_of_speeds(title, values, xlabel, ylabel):
+    """Makes a pyplot scatterplot of the raspberry pi image capture speed
+    """
     
     x = [i for i in range(len(values))]
 

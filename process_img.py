@@ -134,6 +134,15 @@ def scikit_denoising(img):
     return img_as_ubyte(denoised_image)
 
 def dist_to_bbox(point, bbox):
+    """Calculates the distance from point to bbox
+
+    Args:
+        point: a coordinate point
+        bbox: A bounding box
+
+    Returns:
+        float: the distance of point from bounding box
+    """
     px, py = point
     x0, y0, x1, y1 = bbox
     # Ensure the box coordinates are correctly ordered
@@ -169,7 +178,16 @@ def dist_to_bbox(point, bbox):
             return py - y_max
 
 def get_field_cropped_imgs(image, monitor, bbox_adjustment):
-    
+    """Takes in an image of a monitor screen and returns a dict of subsections of that image for each physiological parameter in that monitor screen
+
+    Args:
+        image (Image): Image to subsection
+        monitor (Monitor): specifies the location of the physiological parameters to subsection
+        bbox_adjustment (bool): Whether or not AI should be used for image subsection bounding box selection
+
+    Returns:
+        _type_: _description_
+    """
 
     fieldpos = monitor.get_field_pos()
     imageDict = {}
@@ -248,6 +266,16 @@ def get_field_cropped_imgs(image, monitor, bbox_adjustment):
     return imageDict
 
 def get_parameter_imgs(image, monitor, bbox_adjustment):
+    """Takes a PIL image, gets cropped images of each subsection to focus on each physiological parameter, preprocesses those subsections, and returns it in a dict
+
+    Args:
+        image (Image): Image to get field subsections from
+        monitor (Monitor): The monitor specifying field positions
+        bbox_adjustment (bool): Whether or not AI model EasyOCR should be used to update what sections of the image should be subsectioned
+
+    Returns:
+        dict: dict of hl7 parameter codes to preprocessed image subections
+    """
 
     ideal_height = 100
 
@@ -300,6 +328,16 @@ def get_parameter_imgs(image, monitor, bbox_adjustment):
 
 
 def process_img(imgName, monitor, bbox_adjustment):
+    """Process an input image (specified by imgName) and then returns a dict of all of the subsections of the image that need OCR data extracted from them, having been preprocessed
+
+    Args:
+        imgName (str): path to the image to process
+        monitor (Monitor): the monitor to use to locate which sections of the image need text extracted
+        bbox_adjustment (bool): Whether the EasyOCR AI model should be used to update the text-reading locations or not
+
+    Returns:
+        dict: A dict of hl7 parameter codes to images of that section of the monitor screen that have the numbers that need OCR data extracted from them
+    """
     image = Image.open(imgName)
 
     # Get image in the right orientation

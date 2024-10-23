@@ -1,6 +1,8 @@
 import json
 
 class Monitor:
+    """Monitor class stores the field pixel positions so that which sections in an image must be read from to read each physiological parameter are known
+    """
     def __init__(self, field_pos):
         pos_centres = {}
         for key, value in field_pos.items():
@@ -64,6 +66,8 @@ class CustomMonitor(Monitor):
         super().__init__(self.field_pos)
 
 class Field_Ranges:
+    """Records the ranges of each physiological parameter. Eg heartrate (ecg.hr) can go from 40 to 180
+    """
     field_ranges = {
         "ecg.hr": [180, 40],
         "co2.et": [60, 0],

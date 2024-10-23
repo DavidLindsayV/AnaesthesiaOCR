@@ -11,6 +11,9 @@ from monitor_values import CustomMonitor, Field_Ranges, HospitalMonitor, OldMoni
 
 
 def get_extracted_data(extracted_data_path, fields):
+    """Reads the OCR-extracted data from a csv file
+    """
+    
     extracted_data = []
     with open(extracted_data_path, "r") as file:
         csvreader = csv.reader(file)
@@ -32,6 +35,9 @@ def get_extracted_data(extracted_data_path, fields):
 
 
 def get_expected_data_row(expected_data_sheet, fields, row_num):
+    """Reads the data from the excel sheet containing the actual values for phyiological parameters in each image for one particular image
+    """
+    
     row_num = int(row_num)
     dataframe = openpyxl.load_workbook(os.path.join("images", "monitor_data.xlsx"))
     dataframe1 = dataframe[expected_data_sheet]
@@ -60,6 +66,8 @@ def get_expected_data_row(expected_data_sheet, fields, row_num):
 
 
 def get_expected_data(expected_data_sheet, fields):
+    """Reads the physiological parameters from the excel file containing the physiological parameter values
+    """
     dataframe = openpyxl.load_workbook(os.path.join("images", "monitor_data.xlsx"))
     dataframe1 = dataframe[expected_data_sheet]
     # expected_data = pd.read_excel(os.path.join("images","monitor_data.xlsx"), sheet_name="OldMonitor")
@@ -89,6 +97,15 @@ def get_expected_data(expected_data_sheet, fields):
 
 
 def is_float(string):
+    """Returns whether the string can be cast to a float (eg is a number) (ignores brackets)
+
+    Args:
+        string (str): string of a number
+
+    Returns:
+        bool: whether it's a float
+    """
+    
     string = string.replace("(", "").replace(")", "")
     try:
         float(string)
@@ -97,6 +114,8 @@ def is_float(string):
         return False
 
 def update_eval_params_minmax(eval_params_minmax, j, index, metric):
+    """Updates the min and max found values for the evaluation parameters
+    """
     if metric < eval_params_minmax[j][index][0]:
         eval_params_minmax[j][index][0] = metric
     if metric > eval_params_minmax[j][index][1]:
@@ -104,6 +123,9 @@ def update_eval_params_minmax(eval_params_minmax, j, index, metric):
     return eval_params_minmax
 
 def update_eval_params(eval_params, eval_params_minmax, j, is_correct, edit_dist, cer, num_dist, num_dist_norm):
+    """A function used in calculating the accuracy evaluation metrics
+    """
+    
     if is_correct:
         eval_params[j][0] += 1
     eval_params[j][1] += edit_dist
@@ -120,6 +142,16 @@ def update_eval_params(eval_params, eval_params_minmax, j, is_correct, edit_dist
     return eval_params, eval_params_minmax      
 
 def calculate_accuracy_metrics(extracted_data, expected_data, fields):
+    """Calculates the accuracy evaluation metrics of the OCR and returns them
+
+    Args:
+        extracted_data: The data values extracted via OCR
+        expected_data: The actual physiological parameter values
+        fields: The physiological parameter fields in the extracted/expected data
+
+    Returns:
+        The accuracy evaluation metrics
+    """
     num_correct = 0
     tot_edit_dist = 0
     tot_cer = 0
@@ -194,6 +226,9 @@ def print_accuracy_metrics(
     image_count,
     fields,
 ):
+    """Prints out the accuracy evaluation metrics to terminal
+    """
+    
     print()
     print("ACCURACY: " + avg_accuracy + "%")
     print("AVG EDIT DISTANCE: " + avg_edit_distance + " edits")
@@ -241,6 +276,9 @@ def create_accuracy_pyplots(
     eval_params_minmax,
     fields,
 ):
+    """Makes a pyplot table of the accuracy metrics, and makes a bar graph comparing accuracy values
+    """
+    
     for i in range(len(fields)):
         #Update the eval_params to the best format for the pyplot
         eval_params[i][1] = eval_params[i][1] + " (min " + eval_params_minmax[i][1][0] + ", max " + eval_params_minmax[i][1][1] + ")"
@@ -318,6 +356,14 @@ def create_accuracy_pyplots(
 
 
 def calculate_accuracy(extracted_data_path, expected_data_sheet, monitor):
+    """Calls subfunctions to calculate accuracy metrics, print out accuracy metrics to terminal, and make pyplots to show accuracy metrics
+
+    Args:
+        extracted_data_path (str): The OCR extracted data from monitor screen images
+        expected_data_sheet (str): The actual data that was on the monitor screen images
+        monitor (str): The monitor to use for data extraction
+    """
+    
     print(expected_data_sheet)
 
     if monitor == "HospitalMonitor":
@@ -380,6 +426,11 @@ def calculate_accuracy(extracted_data_path, expected_data_sheet, monitor):
     )
 
 if __name__ == "__main__":
+    """Generates pyplots of accuracy metrics
+    You provide command line arguments of a csv file which records data that was extracted via OCR, and the code calculates accuracy metrics
+    of how accurately the OCR performed
+    """
+    
     if len(sys.argv) == 4:
         calculate_accuracy(sys.argv[1], sys.argv[2], sys.argv[3])
     else:

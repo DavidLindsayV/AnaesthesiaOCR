@@ -9,6 +9,13 @@ from datetime import datetime
 import sys
 
 def checkAnswersForImg(imgNum, ocrAnswers, expected_data):
+    """Checks whether the OCR output does/doesn't match the expected data, and prints out the results to terminal
+
+    Args:
+        imgNum (int): image number
+        ocrAnswers: data extracted via OCR
+        expected_data: The correct answers of what should have been extracted
+    """
     print("Image = " + str(imgNum) + "tmp.jpg")
     print(expected_data)
     print(ocrAnswers)
@@ -17,6 +24,16 @@ def checkAnswersForImg(imgNum, ocrAnswers, expected_data):
             print("WRONG " + key + " Expected: " + expected_data[key] + " Actual: " + ocrAnswers[key])
 
 def get_sheet_name_from_folder_path(imgPath):
+    """Gets the corresponding name of the excel sheet from the image path
+    The excel sheet has all of the actual values of monitor values written in it (all the true field values) and is used for checking accuracy
+
+    Args:
+        imgPath (str): path to an image
+
+    Returns:
+        str: Name of the sheet in monitor_data.xslx that has the data for that image
+    """
+    
     if "brightreflectionhospital" in imgPath:
         return "BrightReflectionHospital"
     elif "darkhospital_images" in imgPath:
@@ -29,6 +46,13 @@ def get_sheet_name_from_folder_path(imgPath):
         return "RepositionedCameraHospital"
 
 def test_with_img(imgPath, monitor): 
+    """Checks OCR accuracy on a given image
+
+    Args:
+        imgPath (str): Path to an image the OCR accuracy will be tested on
+        monitor (Monitor): The monitor that is used for image subsectioning
+    """
+    
     if monitor == "HospitalMonitor":
         monitor = HospitalMonitor()
     elif monitor == "OldMonitor":
@@ -55,12 +79,23 @@ def test_with_img(imgPath, monitor):
     checkAnswersForImg(imgNum, extracted_data[0], expected_data)
 
 def test_with_random_image(imgFolder):
+    """Selects a random image from the specified folder and tests the OCR accuracy on that random image
+
+    Args:
+        imgFolder (str): the name of a subfolder within "images"
+    """
     path = os.path.join("images", imgFolder)
     num_images = len(os.listdir(dir))
     imgNum = random.randint(1, num_images)
     test_with_img(os.path.join(path, imgNum + "tmp.jpg"))
 
 def write_to_csv_all_images(img_folder, monitor):
+    """Writes all images in a given image folder into csv files
+
+    Args:
+        img_folder (str): the folder with images to have data extracted
+        monitor (Monitor): the Monitor used in image subsectioning
+    """
     dir = os.path.join("images", img_folder)
 
     if monitor == "HospitalMonitor":
@@ -97,6 +132,16 @@ def write_to_csv_all_images(img_folder, monitor):
     print("Longest time to process an image: " + str(maxImageTime))
 
 def get_latest_received_img_data(monitor):  
+    """Uses OCR to extract data from the latest image sent into images_from_rpi and returns it as a dict.
+    Is used for sending real time data to EDDI
+
+    Args:
+        monitor (Monitor): the Monitor used in image subsectioning
+
+    Returns:
+        dict: The dict containing OCR extracted data
+    """
+    
     bbox_adjustment = True
     starttime = datetime.now()
     os.chdir('C:\\Users\\david\\Documents\\University_courses\\University_2024_Tri1\\ENGR489\\engr489-anaesthesiaocr')
@@ -121,6 +166,9 @@ def get_latest_received_img_data(monitor):
     return data
 
 if __name__ == "__main__":
+    """Uses OCR to extract all the data within a given image subfolder and writes it into csvs
+    """
+    
     # if len(sys.argv) > 1:
     #     test_with_img(sys.argv[1])
     # else:

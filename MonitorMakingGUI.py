@@ -5,6 +5,8 @@ from tkinter import Button, Canvas
 from PIL import Image, ImageTk
 
 class ImageClickApp:
+    """The GUI to create the JSON file so that a Monitor can be used that knows what pixel positions to read physiological parameters from images of a monitor
+    """
     def __init__(self, root, image_path):
         self.root = root
         self.root.title("Field Position Measurer")
@@ -75,6 +77,8 @@ class ImageClickApp:
             print("The monitor values have been written to MonitorValues.json. You can now close the GUI")
 
 if __name__ == "__main__":
+    """Makes a GUI to create a json file to specify what pixel coordinates need to be used to read from an image
+    """
     if len(sys.argv) == 2:
         # Initialize the Tkinter window
         root = tk.Tk()

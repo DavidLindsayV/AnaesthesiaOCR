@@ -10,12 +10,15 @@ import subprocess
 class VidCapture:
 	def __init__(self, name):
 		self.cap = cv.VideoCapture(name)
+        #Start a thread to constantly poll the camera
 		self.q = queue.Queue()
 		t = threading.Thread(target=self._reader)
 		t.daemon = True
 		t.start()
 	
 	def _reader(self):
+		"""A thread to constantly queue the camera and store the latest image in a queue. This overcomes issues with camera speed
+		"""
 		while True:
 			ret, frame = self.cap.read()
 			if not ret:

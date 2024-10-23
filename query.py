@@ -19,10 +19,27 @@ reader = None
 # TODO: check the length of strings. p1.sys should have max 3 chars, p1.mean is 2 or 3 digits
 
 def removeNonNumberChar(input):
+    """Removes non numerical characters from the input
+
+    Args:
+        input (str): input string
+
+    Returns:
+        str: input string with nonnumerical characters removed
+    """
     return re.sub(r"\D", "", input)
 
 
 def inRange(field, num):
+    """Checks if a string num is within the range of it's field
+
+    Args:
+        field (str): hl7 code of a physiological parameter
+        num (str): a string of a number of that physiological parameter
+
+    Returns:
+        bool: whether the number is within the expected range of that physiological parameter
+    """
     return (
         Field_Ranges.field_ranges[field][1]
         <= float(num)
@@ -31,6 +48,15 @@ def inRange(field, num):
 
 
 def make_in_range(field, num):
+    """A function which takes a string which is out of the expected numerical range, and tries to make it fit in the expected numerical range by removing one character from the front or back
+
+    Args:
+        field: the field hl7 code
+        num: the string of a number that is being improved to fit inside the expected range
+
+    Returns:
+        str: The improved num
+    """
 
     try:  # check that num can be read as a number
         float(num)
@@ -68,6 +94,16 @@ def make_in_range(field, num):
 
 
 def sanitycheck_data(extracted_data):
+    """Takes in data that was etracted via OCR and postprocesses it to make it more accurate
+    Performs fixes such as removing non-numerical characters or trying to fix numbers to make them in an appropriate range
+
+    Args:
+        extracted_data (dict): the data that was extracted via OCR 
+
+    Returns:
+        dict: The extracted data dict, but with the extracted text improved to be less erroneous
+    """
+    
     print("Data pre-sanity check:") #TODO make the sanity checking depend on monitor
     print(extracted_data)
 
@@ -126,9 +162,11 @@ def sanitycheck_data(extracted_data):
 
 
 class BBox:
+    """A class to represent a bounding box
+    """
 
     def __init__(self, box, text):
-        self.box = box  # x0 y0 x1 y1
+        self.box = box  # xmin ymin xmax ymax
         self.text = text
 
     def __repr__(self):
@@ -136,6 +174,14 @@ class BBox:
 
 
 def find_bboxes(image):
+    """Uses EasyOCR to find bounding boxes of all text within the given image
+
+    Args:
+        image: image to find bounding boxes of text in
+
+    Returns:
+        list: a list of BBox objects
+    """
     model = "EasyOCR"
     bboxes = []
 
@@ -159,7 +205,16 @@ def find_bboxes(image):
 
 
 def extract_data(imagesDict):
-    model = "EasyOCR"
+    """Extracts one text field for each image in imagesDict, postprocesses it, and returns it as a dict of physiological parameter code to extracted text
+
+    Args:
+        imagesDict (_type_): The dict of images that need data extracted via OCR
+
+    Returns:
+        dict: The dict of physiological parameter codes and what text has been extracted for each field
+    """
+    
+    model = "EasyOCR" #specifies which model is used
 
     filenames = {}
     # files = []
