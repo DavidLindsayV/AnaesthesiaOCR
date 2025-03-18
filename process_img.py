@@ -279,6 +279,10 @@ def get_parameter_imgs(image, monitor, bbox_adjustment):
 
     ideal_height = 100
 
+    if not os.path.exists(os.path.join(os.getcwd(), "processed_images")):
+        # Create the folder if it doesn't exist
+        os.makedirs(os.path.join(os.getcwd(), "processed_images"))    
+
     for filename in os.listdir("processed_images"):
         os.remove(os.path.join("processed_images", filename))
 

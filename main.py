@@ -131,7 +131,7 @@ def write_to_csv_all_images(img_folder, monitor):
     print("Completed! Time taken = " + str(datetime.now() - starttime))
     print("Longest time to process an image: " + str(maxImageTime))
 
-def get_latest_received_img_data(monitor):  
+def get_latest_received_img_data(monitor, ocrRepo_path):  
     """Uses OCR to extract data from the latest image sent into images_from_rpi and returns it as a dict.
     Is used for sending real time data to EDDI
 
@@ -144,7 +144,7 @@ def get_latest_received_img_data(monitor):
     
     bbox_adjustment = True
     starttime = datetime.now()
-    os.chdir('C:\\Users\\david\\Documents\\University_courses\\University_2024_Tri1\\ENGR489\\engr489-anaesthesiaocr')
+    os.chdir(ocrRepo_path)
     num_images = len(os.listdir("images_from_rpi"))
     imageName = str(num_images) + "tmp.jpg"
     print("Processing image " + imageName)

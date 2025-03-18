@@ -48,8 +48,8 @@ Use 'ssh david@192.168.1.10' on the pi
 If it works, you have succeeded in setting up ethernet connection!
 (this step is important to do as it allows you to add this connection to the list of known hosts)
 If this step doesn't work, try disconnecting and reconnecting all the cables again. Multiple times.
-- Run 'python3 main.py 192.168.1.10 PASSWORD' where 192.168.1.10 is the ip address you want to send the image files to, and PASSWORD is the password for that ip address
-(note: If you are not David using David's PC, you will need to modify app.py, as currently it is set to send files to the C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi folder on the remote host 'david')
+- Run 'python3 main.py david 192.168.1.10 PASSWORD "C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi"' where 192.168.1.10 is the ip address you want to send the image files to, and PASSWORD is the password for that ip address, and david is the name of the remote host, and the path is the path to the images_from_rpi folder that you want the images from the rpi sent to
+Please note: The images_from_rpi path must be in quotation marks, it must have no spaces in it (if your path has spaces in it, rename folders so they use underscores instead), and the slashes must be forward slashes
 - The program on the pi should automatically take images every 10 seconds and send them to the C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi folder
 It will also save the captured images in folders named "images" with a timestamp
 
@@ -70,7 +70,7 @@ You need to make a new terminal and run python3 main.py
 
 It is recommended to use a USB stick to transfer files, or use scp if you have the networking working.
 Generic scp command:
-scp source destination
+scp source destination 
 where 'source' or 'destination' can be addresses on the local machine (eg ./path/to/myfolder/examplefiletomove.txt) or on the remote machine (eg engr302t12@ip_address:/path/to/myfolder/examplefiletomove.txt)
 
 ## Test whether the system is 32 bit or 64 bit

@@ -9,7 +9,7 @@ Pillow==10.3.0
 jiwer==3.0.4
 nltk==3.8.1
 # AI models
-nanonets
-ocr_nanonets_wrapper
+# nanonets
+# ocr_nanonets_wrapper
 pytesseract==0.3.10
 Requests

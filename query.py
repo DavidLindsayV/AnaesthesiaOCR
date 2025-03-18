@@ -3,7 +3,7 @@
 import io
 import os
 import re
-from nanonets import NANONETSOCR
+# from nanonets import NANONETSOCR
 import numpy as np
 import pytesseract
 import requests

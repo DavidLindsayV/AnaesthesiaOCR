@@ -10,15 +10,12 @@ import subprocess
 class VidCapture:
 	def __init__(self, name):
 		self.cap = cv.VideoCapture(name)
-        #Start a thread to constantly poll the camera
 		self.q = queue.Queue()
 		t = threading.Thread(target=self._reader)
 		t.daemon = True
 		t.start()
 	
 	def _reader(self):
-		"""A thread to constantly queue the camera and store the latest image in a queue. This overcomes issues with camera speed
-		"""
 		while True:
 			ret, frame = self.cap.read()
 			if not ret:
@@ -53,7 +50,7 @@ class App:
     """
 
 
-    def __init__(self, IP, password, max_cycles=-1, delay=10):
+    def __init__(self, remote_user, IP, password, remote_folder, max_cycles=-1, delay=10):
         """Initialize the App and relevant class fields.
 
         Args:
@@ -67,12 +64,14 @@ class App:
         self.delay = delay
         self.IP = IP;
         self.password = password
-	
+        self.remote_user = remote_user	
+        self.remote_folder = remote_folder
+        
     def send_image(self, imagename):
-            remote_user = "david"
+            #remote_user = "david"
             remote_host = self.IP
-            remote_folder = "C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi"
-            command = f"sshpass -p {self.password} scp ./{imagename} {remote_user}@{remote_host}:{remote_folder}" 
+            #remote_folder = "C:/Users/david/Documents/University_courses/University_2024_Tri1/ENGR489/engr489-anaesthesiaocr/images_from_rpi"
+            command = f"sshpass -p {self.password} scp ./{imagename} {self.remote_user}@{remote_host}:{self.remote_folder}" 
             try:
                 result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
             except subprocess.CalledProcess as e:
@@ -104,6 +103,7 @@ class App:
             cv.imwrite(imagename, image)
 	    
 	    #Send image to PC via ssh
+            self.send_image(imagename)
             self.send_image(imagename)
             end_image_capture_time = time.perf_counter()
 	    
